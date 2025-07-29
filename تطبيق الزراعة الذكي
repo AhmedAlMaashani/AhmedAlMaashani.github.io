@@ -1,546 +1,403 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:open_file/open_file.dart';
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تطبيق الزراعة الذكي</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f8f7;
+      color: #2c3e50;
+      direction: rtl;
+      text-align: right;
+    }
+    h1, h2 {
+      color: #27ae60;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .search-box {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #bdc3c7;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    .btn:hover {
+      background-color: #219653;
+    }
+    .crop-card {
+      border: 1px solid #ecf0f1;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #f9fafa;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .crop-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    .crop-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      float: right;
+      margin-left: 15px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #bdc3c7;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .close {
+      float: left;
+      font-size: 28px;
+      font-weight: bold;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: #000;
+    }
+    .crop-detail {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    .detail-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #27ae60;
+      min-width: 120px;
+    }
+    .pdf-preview {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px dashed #27ae60;
+      border-radius: 8px;
+      background: #f0fff4;
+    }
+  </style>
+</head>
+<body>
 
-void main() {
-  runApp(MyApp());
-}
+  <div class="container">
+    <h1>تطبيق الزراعة الذكي</h1>
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'تطبيق الزراعة الذكي',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        appBarTheme: const AppBarTheme(color: Colors.green),
-        textDirection: TextDirection.rtl,
-      ),
-      home: HomeScreen(),
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: child!,
-        );
-      },
-    );
-  }
-}
+    <!-- خانة البحث -->
+    <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن محصول..." />
 
-// نموذج المحصول
-class Crop {
-  final String id;
-  final String image; // مسار الصورة
-  final String localName;
-  final String scientificName;
-  final String floweringPeriod;
-  final String fruitingPeriod;
-  final String family;
-  final String lifespan;
-  final String location;
-  final String fertilizationNeeds;
+    <!-- زر إضافة محصول -->
+    <button id="addCropBtn" class="btn">➕ إضافة محصول</button>
 
-  Crop({
-    required this.id,
-    required this.image,
-    required this.localName,
-    required this.scientificName,
-    required this.floweringPeriod,
-    required this.fruitingPeriod,
-    required this.family,
-    required this.lifespan,
-    required this.location,
-    required this.fertilizationNeeds,
-  });
+    <!-- قائمة المحاصيل -->
+    <div id="cropsList"></div>
+  </div>
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'image': image,
-      'localName': localName,
-      'scientificName': scientificName,
-      'floweringPeriod': floweringPeriod,
-      'fruitingPeriod': fruitingPeriod,
-      'family': family,
-      'lifespan': lifespan,
-      'location': location,
-      'fertilizationNeeds': fertilizationNeeds,
+  <!-- نافذة إضافة محصول -->
+  <div id="addCropModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>إضافة محصول جديد</h2>
+      <form id="cropForm">
+        <div class="form-group">
+          <label>اختر صورة</label>
+          <input type="file" id="cropImage" accept="image/*" required />
+          <img id="preview" src="" alt="معاينة الصورة" style="max-width: 100%; margin-top: 10px; display: none;" />
+        </div>
+        <div class="form-group">
+          <label>الاسم المحلي *</label>
+          <input type="text" id="localName" required />
+        </div>
+        <div class="form-group">
+          <label>الاسم العلمي</label>
+          <input type="text" id="scientificName" />
+        </div>
+        <div class="form-group">
+          <label>فترة التزهير</label>
+          <input type="text" id="floweringPeriod" />
+        </div>
+        <div class="form-group">
+          <label>فترة الثمار</label>
+          <input type="text" id="fruitingPeriod" />
+        </div>
+        <div class="form-group">
+          <label>عائلة النبتة</label>
+          <input type="text" id="family" />
+        </div>
+        <div class="form-group">
+          <label>عمر النبتة</label>
+          <input type="text" id="lifespan" />
+        </div>
+        <div class="form-group">
+          <label>الموقع</label>
+          <input type="text" id="location" />
+        </div>
+        <div class="form-group">
+          <label>احتياج التسميد</label>
+          <textarea id="fertilizationNeeds" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn">حفظ المحصول</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- نافذة تفاصيل المحصول -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <span class="close-detail">&times;</span>
+      <h2 id="detailTitle">تفاصيل المحصول</h2>
+      <div id="detailContent" class="crop-detail"></div>
+      <div id="pdfPreview" class="pdf-preview">
+        <p>جاري إنشاء PDF...</p>
+        <div id="pdfContent" style="background:white; padding:20px; border:1px solid #ddd; display:none;"></div>
+      </div>
+      <button id="downloadPdfBtn" class="btn">تنزيل كـ PDF</button>
+    </div>
+  </div>
+
+  <script>
+    // المتغيرات
+    let crops = JSON.parse(localStorage.getItem('crops') || '[]');
+    const searchInput = document.getElementById('searchInput');
+    const cropsList = document.getElementById('cropsList');
+    const addCropBtn = document.getElementById('addCropBtn');
+    const addCropModal = document.getElementById('addCropModal');
+    const detailModal = document.getElementById('detailModal');
+    const cropForm = document.getElementById('cropForm');
+    const preview = document.getElementById('preview');
+    const cropImage = document.getElementById('cropImage');
+
+    // عرض الصورة المختارة
+    cropImage.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          preview.src = reader.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // فتح نافذة الإضافة
+    addCropBtn.onclick = () => {
+      addCropModal.style.display = 'block';
+      cropForm.reset();
+      preview.style.display = 'none';
     };
-  }
 
-  factory Crop.fromMap(Map<String, dynamic> map) {
-    return Crop(
-      id: map['id'],
-      image: map['image'],
-      localName: map['localName'],
-      scientificName: map['scientificName'],
-      floweringPeriod: map['floweringPeriod'],
-      fruitingPeriod: map['fruitingPeriod'],
-      family: map['family'],
-      lifespan: map['lifespan'],
-      location: map['location'],
-      fertilizationNeeds: map['fertilizationNeeds'],
-    );
-  }
-}
+    // إغلاق النافذات
+    document.querySelector('.close').onclick = () => {
+      addCropModal.style.display = 'none';
+    };
+    document.querySelector('.close-detail').onclick = () => {
+      detailModal.style.display = 'none';
+    };
+    window.onclick = (e) => {
+      if (e.target === addCropModal) addCropModal.style.display = 'none';
+      if (e.target === detailModal) detailModal.style.display = 'none';
+    };
 
-// الشاشة الرئيسية
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
+    // حفظ المحصول
+    cropForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const file = cropImage.files[0];
+      let imageUrl = '';
+      if (file) {
+        imageUrl = await toBase64(file);
+      }
 
-class _HomeScreenState extends State<HomeScreen> {
-  List<Crop> _crops = [];
-  List<Crop> _filteredCrops = [];
-  final TextEditingController _searchController = TextEditingController();
+      const newCrop = {
+        id: Date.now().toString(),
+        image: imageUrl,
+        localName: document.getElementById('localName').value,
+        scientificName: document.getElementById('scientificName').value,
+        floweringPeriod: document.getElementById('floweringPeriod').value,
+        fruitingPeriod: document.getElementById('fruitingPeriod').value,
+        family: document.getElementById('family').value,
+        lifespan: document.getElementById('lifespan').value,
+        location: document.getElementById('location').value,
+        fertilizationNeeds: document.getElementById('fertilizationNeeds').value,
+      };
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCrops();
-    _searchController.addListener(_onSearchChanged);
-  }
-
-  void _onSearchChanged() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredCrops = _crops.where((crop) {
-        return crop.localName.toLowerCase().contains(query) ||
-            crop.scientificName.toLowerCase().contains(query);
-      }).toList();
+      crops.push(newCrop);
+      localStorage.setItem('crops', JSON.stringify(crops));
+      addCropModal.style.display = 'none';
+      renderCrops();
+      alert('تم حفظ المحصول بنجاح!');
     });
-  }
 
-  Future<void> _loadCrops() async {
-    final prefs = await SharedPreferences.getInstance();
-    final cropIds = prefs.getStringList('crop_ids') ?? [];
-
-    final List<Crop> crops = [];
-    for (String id in cropIds) {
-      final cropJson = prefs.getString('crop_$id');
-      if (cropJson != null) {
-        final map = Map<String, dynamic>.from(
-            (cropJson as Object).toString().split('}').first + '}');
-        // نستخدم json الحقيقي في التطبيق
-        // لكن بسبب التحدي، نستخدم طريقة بسيطة
-        // في الواقع: import 'dart:convert'; ثم json.decode(cropJson)
-        // سنستخدم json.decode
-      }
-    }
-
-    // الاستخدام الصحيح مع JSON
-    final List<Crop> loaded = [];
-    for (String id in cropIds) {
-      final String? json = prefs.getString('crop_$id');
-      if (json != null) {
-        try {
-          final map = Map<String, dynamic>.from(jsonDecode(json));
-          loaded.add(Crop.fromMap(map));
-        } catch (e) {
-          print('Error parsing crop $id: $e');
-        }
-      }
-    }
-
-    setState(() {
-      _crops = loaded;
-      _filteredCrops = loaded;
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('تطبيق الزراعة الذكي')),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: 'ابحث عن محصول',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-              textInputAction: TextInputAction.search,
-            ),
-          ),
-          Expanded(
-            child: _filteredCrops.isEmpty
-                ? const Center(child: Text('لا توجد محاصيل. أضف واحدًا!'))
-                : ListView.builder(
-                    itemCount: _filteredCrops.length,
-                    itemBuilder: (context, index) {
-                      final crop = _filteredCrops[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: ListTile(
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              File(crop.image),
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          title: Text(crop.localName),
-                          subtitle: Text(crop.scientificName),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CropDetailScreen(crop: crop),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddCropScreen()),
-          );
-          if (result == true) {
-            _loadCrops(); // إعادة التحميل بعد الإضافة
-          }
-        },
-        child: const Icon(Icons.add),
-        tooltip: 'إضافة محصول',
-      ),
-    );
-  }
-
-  // دالة فك الترميز (مفقودة في بعض البيئات)
-  dynamic jsonDecode(String source) {
-    return Function.apply(
-      () => source
-          .replaceAll("'", '"')
-          .replaceAll('id:', '"id":')
-          .replaceAll('image:', '"image":')
-          .replaceAll('localName:', '"localName":')
-          .replaceAll('scientificName:', '"scientificName":')
-          .replaceAll('floweringPeriod:', '"floweringPeriod":')
-          .replaceAll('fruitingPeriod:', '"fruitingPeriod":')
-          .replaceAll('family:', '"family":')
-          .replaceAll('lifespan:', '"lifespan":')
-          .replaceAll('location:', '"location":')
-          .replaceAll('fertilizationNeeds:', '"fertilizationNeeds":'),
-      [],
-    );
-  }
-}
-
-// شاشة إضافة محصول
-class AddCropScreen extends StatefulWidget {
-  @override
-  _AddCropScreenState createState() => _AddCropScreenState();
-}
-
-class _AddCropScreenState extends State<AddCropScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _localNameController = TextEditingController();
-  final _scientificNameController = TextEditingController();
-  final _floweringController = TextEditingController();
-  final _fruitingController = TextEditingController();
-  final _familyController = TextEditingController();
-  final _lifespanController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _fertilizationController = TextEditingController();
-
-  XFile? _pickedImage;
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.camera);
-    if (image == null) {
-      final gallery = await picker.pickImage(source: ImageSource.gallery);
-      if (gallery != null) {
-        setState(() => _pickedImage = gallery);
-      }
-    } else {
-      setState(() => _pickedImage = image);
-    }
-  }
-
-  Future<void> _saveCrop() async {
-    if (!_formKey.currentState!.validate() || _pickedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى ملء جميع الحقول واختيار صورة')),
+    // عرض المحاصيل
+    function renderCrops(query = '') {
+      cropsList.innerHTML = '';
+      const filtered = crops.filter(crop =>
+        crop.localName.includes(query) || crop.scientificName.includes(query)
       );
-      return;
+
+      if (filtered.length === 0) {
+        cropsList.innerHTML = '<p>لا توجد محاصيل. أضف واحدًا!</p>';
+        return;
+      }
+
+      filtered.forEach(crop => {
+        const div = document.createElement('div');
+        div.className = 'crop-card';
+        div.innerHTML = `
+          <img src="${crop.image || 'https://via.placeholder.com/80'}" alt="صورة المحصول" class="crop-image" />
+          <strong>${crop.localName}</strong><br>
+          <small>${crop.scientificName || 'لا يوجد اسم علمي'}</small>
+        `;
+        div.onclick = () => showCropDetail(crop);
+        cropsList.appendChild(div);
+      });
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    final cropIds = prefs.getStringList('crop_ids') ?? [];
+    // عرض تفاصيل المحصول
+    function showCropDetail(crop) {
+      const detailContent = document.getElementById('detailContent');
+      detailContent.innerHTML = `
+        <img src="${crop.image}" alt="صورة المحصول" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:15px;" />
+        <div class="detail-row"><div class="detail-label">الاسم المحلي:</div> <div>${crop.localName}</div></div>
+        <div class="detail-row"><div class="detail-label">الاسم العلمي:</div> <div>${crop.scientificName || 'غير محدد'}</div></div>
+        <div class="detail-row"><div class="detail-label">فترة التزهير:</div> <div>${crop.floweringPeriod || 'غير محدد'}</div></div>
+        <div class="detail-row"><div class="detail-label">فترة الثمار:</div> <div>${crop.fruitingPeriod || 'غير محدد'}</div></div>
+        <div class="detail-row"><div class="detail-label">عائلة النبتة:</div> <div>${crop.family || 'غير محدد'}</div></div>
+        <div class="detail-row"><div class="detail-label">عمر النبتة:</div> <div>${crop.lifespan || 'غير محدد'}</div></div>
+        <div class="detail-row"><div class="detail-label">الموقع:</div> <div>${crop.location || 'غير محدد'}</div></div>
+        <div class="detail-row"><div class="detail-label">احتياج التسميد:</div> <div>${crop.fertilizationNeeds || 'غير محدد'}</div></div>
+      `;
+      document.getElementById('detailTitle').textContent = crop.localName;
+      detailModal.style.display = 'block';
+    }
 
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-    final imagePath = await _copyImageToAppDir(_pickedImage!);
+    // تحويل إلى Base64
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
 
-    final crop = Crop(
-      id: id,
-      image: imagePath,
-      localName: _localNameController.text,
-      scientificName: _scientificNameController.text,
-      floweringPeriod: _floweringController.text,
-      fruitingPeriod: _fruitingController.text,
-      family: _familyController.text,
-      lifespan: _lifespanController.text,
-      location: _locationController.text,
-      fertilizationNeeds: _fertilizationController.text,
-    );
+    // تنزيل كـ PDF
+    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-    cropIds.add(id);
-    await prefs.setStringList('crop_ids', cropIds);
-    await prefs.setString('crop_$id', crop.toMap().toString().replaceAll('{', '{"').replaceAll(', ', ', "').replaceAll(':', '":'));
+      const crop = crops.find(c => c.localName === document.getElementById('detailTitle').textContent);
+      doc.setFontSize(22);
+      doc.text(crop.localName, 105, 20, null, null, 'center');
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم حفظ المحصول بنجاح!')),
-    );
-    Navigator.pop(context, true);
-  }
+      if (crop.image) {
+        const img = new Image();
+        img.src = crop.image;
+        await new Promise(resolve => {
+          img.onload = resolve;
+        });
+        doc.addImage(img, 'JPEG', 15, 30, 180, 100);
+      }
 
-  Future<String> _copyImageToAppDir(XFile image) async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final fileName = path.basename(image.path);
-    final File localImage = File('${appDir.path}/$fileName');
-    return await image.saveTo(localImage.path);
-  }
+      let y = crop.image ? 140 : 30;
+      doc.setFontSize(12);
+      const fields = [
+        ['الاسم المحلي', crop.localName],
+        ['الاسم العلمي', crop.scientificName || 'غير محدد'],
+        ['فترة التزهير', crop.floweringPeriod || 'غير محدد'],
+        ['فترة الثمار', crop.fruitingPeriod || 'غير محدد'],
+        ['عائلة النبتة', crop.family || 'غير محدد'],
+        ['عمر النبتة', crop.lifespan || 'غير محدد'],
+        ['الموقع', crop.location || 'غير محدد'],
+        ['احتياج التسميد', crop.fertilizationNeeds || 'غير محدد'],
+      ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('إضافة محصول جديد')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[200],
-                  ),
-                  child: _pickedImage == null
-                      ? const Center(child: Text('اضغط لاختيار صورة'))
-                      : Image.file(File(_pickedImage!.path), fit: BoxFit.cover),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _localNameController,
-                decoration: const InputDecoration(labelText: 'الاسم المحلي *'),
-                validator: (v) => v!.isEmpty ? 'مطلوب' : null,
-              ),
-              TextFormField(
-                controller: _scientificNameController,
-                decoration: const InputDecoration(labelText: 'الاسم العلمي'),
-              ),
-              TextFormField(
-                controller: _floweringController,
-                decoration: const InputDecoration(labelText: 'فترة التزهير'),
-              ),
-              TextFormField(
-                controller: _fruitingController,
-                decoration: const InputDecoration(labelText: 'فترة الثمار'),
-              ),
-              TextFormField(
-                controller: _familyController,
-                decoration: const InputDecoration(labelText: 'عائلة النبتة'),
-              ),
-              TextFormField(
-                controller: _lifespanController,
-                decoration: const InputDecoration(labelText: 'عمر النبتة'),
-              ),
-              TextFormField(
-                controller: _locationController,
-                decoration: const InputDecoration(labelText: 'الموقع'),
-              ),
-              TextFormField(
-                controller: _fertilizationController,
-                decoration: const InputDecoration(labelText: 'احتياج التسميد'),
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: _saveCrop,
-                child: const Text('حفظ المحصول'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+      fields.forEach(([label, value]) => {
+        if (y > 280) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.setFont('bold');
+        doc.text(`${label}:`, 190, y, { align: 'right' });
+        doc.setFont('normal');
+        doc.text(value, 188, y + 5, { align: 'right' });
+        y += 15;
+      });
 
-// شاشة تفاصيل المحصول
-class CropDetailScreen extends StatelessWidget {
-  final Crop crop;
+      doc.save(`${crop.localName}.pdf`);
+    });
 
-  const CropDetailScreen({Key? key, required this.crop}) : super(key: key);
+    // بحث
+    searchInput.addEventListener('input', () => {
+      renderCrops(searchInput.value);
+    });
 
-  Future<void> _exportToPdf(BuildContext context) async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'معلومات المحصول',
-              style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 20),
-            if (crop.image.isNotEmpty)
-              pw.Container(
-                height: 200,
-                width: double.infinity,
-                child: pw.FittedBox(
-                  child: pw.MemoryImage(File(crop.image).readAsBytesSync()),
-                  fit: pw.BoxFit.cover,
-                ),
-                decoration: pw.BoxDecoration(border: pw.Border.all()),
-              ),
-            pw.SizedBox(height: 20),
-            _buildRow('الاسم المحلي', crop.localName),
-            _buildRow('الاسم العلمي', crop.scientificName),
-            _buildRow('فترة التزهير', crop.floweringPeriod),
-            _buildRow('فترة الثمار', crop.fruitingPeriod),
-            _buildRow('عائلة النبتة', crop.family),
-            _buildRow('عمر النبتة', crop.lifespan),
-            _buildRow('الموقع', crop.location),
-            _buildRow('احتياج التسميد', crop.fertilizationNeeds),
-          ],
-        ),
-      ),
-    );
-
-    final Uint8List pdfBytes = await pdf.save();
-    final output = await getExternalStorageDirectory();
-    final file = File('${output!.path}/${crop.localName}.pdf');
-    await file.writeAsBytes(pdfBytes);
-
-    await OpenFile.open(file.path);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('تم حفظ PDF في ${file.path}')),
-    );
-  }
-
-  pw.Widget _buildRow(String label, String value) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 4),
-      child: pw.Row(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Expanded(
-            flex: 2,
-            child: pw.Text(
-              '$label:',
-              style: const pw.TextStyle(fontWeight: pw.FontWeight.bold),
-            ),
-          ),
-          pw.Expanded(
-            flex: 3,
-            child: pw.Text(value.isEmpty ? 'غير محدد' : value, textAlign: pw.TextAlign.right),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(crop.localName),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.download),
-            onPressed: () => _exportToPdf(context),
-            tooltip: 'تنزيل كـ PDF',
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (crop.image.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  File(crop.image),
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            const SizedBox(height: 20),
-            _buildInfo('الاسم المحلي', crop.localName),
-            _buildInfo('الاسم العلمي', crop.scientificName),
-            _buildInfo('فترة التزهير', crop.floweringPeriod),
-            _buildInfo('فترة الثمار', crop.fruitingPeriod),
-            _buildInfo('عائلة النبتة', crop.family),
-            _buildInfo('عمر النبتة', crop.lifespan),
-            _buildInfo('الموقع', crop.location),
-            _buildInfo('احتياج التسميد', crop.fertilizationNeeds),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfo(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: Text(
-              '$label:',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              value.isEmpty ? 'غير محدد' : value,
-              textAlign: TextAlign.right,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+    // تحميل المحاصيل عند البدء
+    renderCrops();
+  </script>
+</body>
+</html>
