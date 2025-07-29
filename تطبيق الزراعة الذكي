@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>تطبيق الزراعة الذكي</title>
+  <meta name="theme-color" content="#27ae60">
+  <title>زراعتي - تطبيق الزراعة الذكي</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -132,28 +135,31 @@
       color: #27ae60;
       min-width: 120px;
     }
-    .pdf-preview {
-      display: none;
-      margin-top: 20px;
-      padding: 15px;
-      border: 1px dashed #27ae60;
-      border-radius: 8px;
-      background: #f0fff4;
+    .copy-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .copy-btn:hover {
+      background-color: #2980b9;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>تطبيق الزراعة الذكي</h1>
+    <h1>زراعتي 🌱</h1>
+    <p>تطبيق الزراعة الذكي لإدارة المحاصيل</p>
 
-    <!-- خانة البحث -->
     <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن محصول..." />
 
-    <!-- زر إضافة محصول -->
     <button id="addCropBtn" class="btn">➕ إضافة محصول</button>
 
-    <!-- قائمة المحاصيل -->
     <div id="cropsList"></div>
   </div>
 
@@ -165,7 +171,7 @@
       <form id="cropForm">
         <div class="form-group">
           <label>اختر صورة</label>
-          <input type="file" id="cropImage" accept="image/*" required />
+          <input type="file" id="cropImage" accept="image/*" />
           <img id="preview" src="" alt="معاينة الصورة" style="max-width: 100%; margin-top: 10px; display: none;" />
         </div>
         <div class="form-group">
@@ -205,21 +211,27 @@
     </div>
   </div>
 
-  <!-- نافذة تفاصيل المحصول -->
+  <!-- نافذة التفاصيل -->
   <div id="detailModal" class="modal">
     <div class="modal-content">
       <span class="close-detail">&times;</span>
       <h2 id="detailTitle">تفاصيل المحصول</h2>
       <div id="detailContent" class="crop-detail"></div>
-      <div id="pdfPreview" class="pdf-preview">
-        <p>جاري إنشاء PDF...</p>
-        <div id="pdfContent" style="background:white; padding:20px; border:1px solid #ddd; display:none;"></div>
-      </div>
+      <button id="copyToClipboard" class="copy-btn">📋 نسخ التفاصيل</button>
       <button id="downloadPdfBtn" class="btn">تنزيل كـ PDF</button>
     </div>
   </div>
 
   <script>
+    // تفعيل Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('SW مسجل', reg))
+          .catch(err => console.log('خطأ في تسجيل SW', err));
+      });
+    }
+
     // المتغيرات
     let crops = JSON.parse(localStorage.getItem('crops') || '[]');
     const searchInput = document.getElementById('searchInput');
@@ -231,7 +243,7 @@
     const preview = document.getElementById('preview');
     const cropImage = document.getElementById('cropImage');
 
-    // عرض الصورة المختارة
+    // عرض الصورة
     cropImage.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -244,14 +256,13 @@
       }
     });
 
-    // فتح نافذة الإضافة
+    // فتح/إغلاق النافذات
     addCropBtn.onclick = () => {
       addCropModal.style.display = 'block';
       cropForm.reset();
       preview.style.display = 'none';
     };
 
-    // إغلاق النافذات
     document.querySelector('.close').onclick = () => {
       addCropModal.style.display = 'none';
     };
@@ -294,9 +305,11 @@
 
     // عرض المحاصيل
     function renderCrops(query = '') {
+      const term = searchInput.value.toLowerCase();
       cropsList.innerHTML = '';
       const filtered = crops.filter(crop =>
-        crop.localName.includes(query) || crop.scientificName.includes(query)
+        crop.localName.toLowerCase().includes(term) ||
+        (crop.scientificName && crop.scientificName.toLowerCase().includes(term))
       );
 
       if (filtered.length === 0) {
@@ -317,11 +330,11 @@
       });
     }
 
-    // عرض تفاصيل المحصول
+    // عرض التفاصيل
     function showCropDetail(crop) {
       const detailContent = document.getElementById('detailContent');
       detailContent.innerHTML = `
-        <img src="${crop.image}" alt="صورة المحصول" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:15px;" />
+        ${crop.image ? `<img src="${crop.image}" alt="صورة المحصول" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:15px;" />` : ''}
         <div class="detail-row"><div class="detail-label">الاسم المحلي:</div> <div>${crop.localName}</div></div>
         <div class="detail-row"><div class="detail-label">الاسم العلمي:</div> <div>${crop.scientificName || 'غير محدد'}</div></div>
         <div class="detail-row"><div class="detail-label">فترة التزهير:</div> <div>${crop.floweringPeriod || 'غير محدد'}</div></div>
@@ -335,7 +348,7 @@
       detailModal.style.display = 'block';
     }
 
-    // تحويل إلى Base64
+    // تحويل الصورة إلى Base64
     function toBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -344,6 +357,16 @@
         reader.onerror = error => reject(error);
       });
     }
+
+    // نسخ التفاصيل إلى الحافظة
+    document.getElementById('copyToClipboard').addEventListener('click', () => {
+      const text = document.getElementById('detailContent').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('تم نسخ التفاصيل إلى الحافظة!');
+      }).catch(err => {
+        alert('فشل النسخ: ' + err);
+      });
+    });
 
     // تنزيل كـ PDF
     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
@@ -357,9 +380,7 @@
       if (crop.image) {
         const img = new Image();
         img.src = crop.image;
-        await new Promise(resolve => {
-          img.onload = resolve;
-        });
+        await new Promise(resolve => { img.onload = resolve; });
         doc.addImage(img, 'JPEG', 15, 30, 180, 100);
       }
 
@@ -392,11 +413,9 @@
     });
 
     // بحث
-    searchInput.addEventListener('input', () => {
-      renderCrops(searchInput.value);
-    });
+    searchInput.addEventListener('input', renderCrops);
 
-    // تحميل المحاصيل عند البدء
+    // تحميل المحاصيل
     renderCrops();
   </script>
 </body>
