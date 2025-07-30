@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -144,6 +145,17 @@
       text-align: left;
       margin-top: 15px;
     }
+    /* قالب PDF - نجعله مرئيًا مؤقتًا في iframe */
+    .pdf-template {
+      font-family: 'Segoe UI', sans-serif;
+      direction: rtl;
+      text-align: right;
+      padding: 20px;
+      background: white;
+      width: 180mm;
+      margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
     @media (max-width: 480px) {
       .container { padding: 10px; }
       .btn { font-size: 14px; padding: 8px 12px; }
@@ -155,7 +167,7 @@
 <body>
 
   <div class="container">
-    <h1>زراعتي </h1>
+    <h1>زراعتي 🌿</h1>
     <p>تطبيق إدارة المحاصيل الذكي</p>
     <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن محصول..." />
     <button id="addCropBtn" class="btn">➕ إضافة محصول</button>
@@ -225,8 +237,10 @@
     </div>
   </div>
 
-  <!-- قالب مخفي لإنشاء PDF -->
-  <div id="pdfTemplate" style="display:none; font-family:sans-serif; direction:rtl; text-align:right; width:180mm; background:white; padding:20px;"></div>
+  <!-- محتوى مؤقت لـ PDF (مرئي فقط عند الإنشاء) -->
+  <div id="pdfContainer" style="position:fixed; top:-9999px; left:-9999px; width:0; height:0; overflow:hidden;">
+    <iframe id="pdfFrame" style="width:180mm; height:297mm; border:none;"></iframe>
+  </div>
 
   <!-- تحميل المكتبات -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -235,7 +249,7 @@
   <script>
     // التحقق من دعم localStorage
     if (typeof localStorage === 'undefined') {
-      alert('متصفحك لا يدعم التخزين. استخدم Chrome أو Firefox.');
+      alert('متصفحك لا يدعم التخزين. استخدم Chrome.');
     }
 
     // تسجيل Service Worker
@@ -257,9 +271,10 @@
     const cropForm = document.getElementById('cropForm');
     const preview = document.getElementById('preview');
     const cropImage = document.getElementById('cropImage');
-    const pdfTemplate = document.getElementById('pdfTemplate');
+    const pdfFrame = document.getElementById('pdfFrame');
+    const pdfContainer = document.getElementById('pdfContainer');
 
-    // عرض الصورة المختارة
+    // عرض الصورة
     cropImage.addEventListener('change', () => {
       const file = cropImage.files[0];
       if (file) {
@@ -306,7 +321,7 @@
       cropModal.style.display = 'block';
     }
 
-    // ضغط الصورة قبل التحويل
+    // ضغط الصورة
     function compressImage(file, maxWidth = 800) {
       return new Promise(resolve => {
         const img = new Image();
@@ -315,18 +330,15 @@
           const ctx = canvas.getContext('2d');
           let width = img.width;
           let height = img.height;
-
           if (width > maxWidth) {
             height = Math.round((height * maxWidth) / width);
             width = maxWidth;
           }
-
           canvas.width = width;
           canvas.height = height;
           ctx.drawImage(img, 0, 0, width, height);
-
           canvas.toBlob(blob => {
-            const compressed = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+            const compressed = new File([blob], file.name, { type: 'image/jpeg' });
             resolve(compressed);
           }, 'image/jpeg', 0.7);
         };
@@ -363,7 +375,6 @@
           imageUrl = await toBase64(compressedFile);
         } catch (error) {
           alert('فشل تحميل الصورة. حاول صورة أصغر.');
-          console.error('Image error:', error);
           return;
         }
       }
@@ -393,13 +404,13 @@
         renderCrops();
         alert('تم الحفظ بنجاح!');
       } catch (e) {
-        alert('الجهاز ممتلئ أو المتصفح لا يدعم التخزين.');
+        alert('فشل الحفظ. الجهاز ممتلئ أو المتصفح قديم.');
       }
     });
 
     // حذف المحصول
     function deleteCrop(id) {
-      if (confirm('هل أنت متأكد من حذف هذا المحصول؟')) {
+      if (confirm('هل أنت متأكد من الحذف؟')) {
         crops = crops.filter(c => c.id !== id);
         localStorage.setItem('crops', JSON.stringify(crops));
         detailModal.style.display = 'none';
@@ -490,39 +501,73 @@
       deleteCrop(currentCropId);
     });
 
-    // تنزيل كـ PDF
+    // تنزيل كـ PDF (يدعم العربية على الهاتف)
     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
       const crop = crops.find(c => c.id === currentCropId);
       const { jsPDF } = window.jspdf;
+
+      // إنشاء محتوى داخل iframe
+      const doc = pdfFrame.contentDocument || pdfFrame.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: 'Segoe UI', sans-serif; direction: rtl; text-align: right; margin: 0; padding: 20px; background: white; }
+            .pdf-template { width: 180mm; margin: 0 auto; }
+            img { max-width: 100%; height: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="pdf-template">
+            <h2 style="text-align:center;">${crop.localName}</h2>
+            ${crop.image ? `<img src="${crop.image}" style="display:block; margin:20px auto; max-width:150px;">` : ''}
+            <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
+            <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
+            <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
+            <p><strong>فترة الثمار:</strong> ${crop.fruitingPeriod || 'غير محدد'}</p>
+            <p><strong>عائلة النبتة:</strong> ${crop.family || 'غير محدد'}</p>
+            <p><strong>عمر النبتة:</strong> ${crop.lifespan || 'غير محدد'}</p>
+            <p><strong>الموقع:</strong> ${crop.location || 'غير محدد'}</p>
+            <p><strong>احتياج التسميد:</strong> ${crop.fertilizationNeeds || 'غير محدد'}</p>
+          </div>
+        </body>
+        </html>
+      `);
+      doc.close();
+
+      // الانتظار حتى تحميل الصورة
+      await new Promise(resolve => {
+        const img = doc.querySelector('img');
+        if (img) {
+          img.onload = resolve;
+          if (img.complete) resolve();
+        } else {
+          resolve();
+        }
+      });
+
+      // التقاط الشاشة
+      const canvas = await html2canvas(pdfFrame, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: 'white',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.9);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
 
-      pdfTemplate.innerHTML = `
-        <h2 style="text-align:center;">${crop.localName}</h2>
-        ${crop.image ? `<img src="${crop.image}" style="width:100%; max-width:150px; display:block; margin:20px auto;">` : ''}
-        <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
-        <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
-        <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
-        <p><strong>فترة الثمار:</strong> ${crop.fruitingPeriod || 'غير محدد'}</p>
-        <p><strong>عائلة النبتة:</strong> ${crop.family || 'غير محدد'}</p>
-        <p><strong>عمر النبتة:</strong> ${crop.lifespan || 'غير محدد'}</p>
-        <p><strong>الموقع:</strong> ${crop.location || 'غير محدد'}</p>
-        <p><strong>احتياج التسميد:</strong> ${crop.fertilizationNeeds || 'غير محدد'}</p>
-      `;
-
-      try {
-        const canvas = await html2canvas(pdfTemplate, { scale: 2, useCORS: true, backgroundColor: 'white' });
-        const imgData = canvas.toDataURL('image/jpeg', 0.9);
-        const width = pdf.internal.pageSize.getWidth();
-        const height = (canvas.height * width) / canvas.width;
-        pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
-        pdf.save(`${crop.localName}.pdf`);
-      } catch (error) {
-        alert('خطأ في إنشاء PDF. حاول مجددًا.');
-      }
+      const width = pdf.internal.pageSize.getWidth();
+      const height = (canvas.height * width) / canvas.width;
+      pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
+      pdf.save(`${crop.localName}.pdf`);
     });
 
     // بحث
