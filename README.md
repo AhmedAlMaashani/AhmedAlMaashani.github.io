@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -5,7 +6,6 @@
   <meta name="theme-color" content="#27ae60">
   <title>زراعتي - تطبيق الزراعة الذكي</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="icons/icon-192.png">
   <style>
     :root {
       --primary: #27ae60;
@@ -22,21 +22,19 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', 'Amiri', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
     }
 
     body {
       background-color: var(--light);
       color: var(--dark);
       line-height: 1.7;
-      direction: rtl;
     }
 
     .container {
       max-width: 1200px;
       margin: 20px auto;
       padding: 15px;
-      min-height: 100vh;
     }
 
     header {
@@ -47,12 +45,6 @@
     header h1 {
       color: var(--primary);
       font-size: 1.8rem;
-      margin: 10px 0;
-    }
-
-    header p {
-      color: #555;
-      font-size: 1rem;
     }
 
     .search-box {
@@ -63,12 +55,6 @@
       border-radius: 12px;
       margin-bottom: 20px;
       outline: none;
-      transition: all 0.3s;
-    }
-
-    .search-box:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
     }
 
     .btn {
@@ -79,10 +65,6 @@
       font-size: 16px;
       border-radius: 10px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.3s;
     }
 
     .btn:hover {
@@ -119,13 +101,12 @@
       border-radius: 14px;
       overflow: hidden;
       box-shadow: var(--shadow);
-      transition: transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
+      transition: transform 0.3s;
     }
 
     .crop-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     }
 
     .crop-img-container {
@@ -145,7 +126,6 @@
 
     .crop-name {
       font-weight: bold;
-      font-size: 1.2rem;
       color: var(--primary);
       margin-bottom: 5px;
     }
@@ -157,12 +137,11 @@
 
     .crop-actions {
       display: flex;
-      justify-content: flex-start;
       gap: 5px;
       margin-top: 10px;
     }
 
-    /* نافذة الإضافة/التعديل */
+    /* النماذج */
     .modal {
       display: none;
       position: fixed;
@@ -191,7 +170,6 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
-      padding-bottom: 10px;
       border-bottom: 1px solid #eee;
     }
 
@@ -218,7 +196,6 @@
       display: block;
       margin-bottom: 6px;
       font-weight: bold;
-      color: var(--dark);
     }
 
     .form-group input,
@@ -245,7 +222,7 @@
       display: none;
     }
 
-    /* نافذة التفاصيل */
+    /* تفاصيل المحصول */
     .detail-content {
       background: #f8f9fa;
       padding: 20px;
@@ -256,7 +233,6 @@
     .detail-row {
       display: flex;
       margin-bottom: 12px;
-      font-size: 15px;
     }
 
     .detail-label {
@@ -281,15 +257,19 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 15px;
     }
 
-    @media (max-width: 480px) {
-      .container { padding: 10px; }
-      .btn { font-size: 15px; padding: 10px 16px; }
-      .crop-name { font-size: 1.1rem; }
-      .modal-content { margin: 10% auto; }
-      .detail-label { min-width: 110px; }
+    /* قالب PDF - لا تستخدم display: none */
+    #pdfTemplate {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 180mm;
+      background: white;
+      padding: 20px;
+      direction: rtl;
+      text-align: right;
+      font-family: 'Segoe UI', sans-serif;
     }
   </style>
 </head>
@@ -377,10 +357,8 @@
     </div>
   </div>
 
-  <!-- قالب PDF مؤقت -->
-  <div id="pdfContainer" style="position:fixed; top:-9999px; left:-9999px; width:0; height:0;">
-    <iframe id="pdfFrame" style="width:180mm; height:297mm;"></iframe>
-  </div>
+  <!-- قالب PDF (مرئي تقنيًا لكن خارج الشاشة) -->
+  <div id="pdfTemplate"></div>
 
   <!-- تحميل المكتبات -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -411,8 +389,7 @@
     const cropForm = document.getElementById('cropForm');
     const preview = document.getElementById('preview');
     const cropImage = document.getElementById('cropImage');
-    const pdfFrame = document.getElementById('pdfFrame');
-    const pdfContainer = document.getElementById('pdfContainer');
+    const pdfTemplate = document.getElementById('pdfTemplate');
 
     // عرض الصورة
     cropImage.addEventListener('change', () => {
@@ -550,7 +527,7 @@
 
     // حذف المحصول
     function deleteCrop(id) {
-      if (confirm('هل أنت متأكد من حذف هذا المحصول؟')) {
+      if (confirm('هل أنت متأكد من الحذف؟')) {
         crops = crops.filter(c => c.id !== id);
         localStorage.setItem('crops', JSON.stringify(crops));
         detailModal.style.display = 'none';
@@ -668,72 +645,64 @@
       deleteCrop(currentCropId);
     });
 
-    // تنزيل كـ PDF (يدعم العربية على الهاتف)
+    // تنزيل كـ PDF (الحل النهائي)
     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
       const crop = crops.find(c => c.id === currentCropId);
+      if (!crop) return;
+
       const { jsPDF } = window.jspdf;
-
-      const doc = pdfFrame.contentDocument || pdfFrame.contentWindow.document;
-      doc.open();
-      doc.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: 'Segoe UI', sans-serif; direction: rtl; text-align: right; margin: 0; padding: 20px; background: white; }
-            .pdf-content { width: 180mm; margin: 0 auto; }
-            img { max-width: 100%; height: auto; margin: 20px auto; display: block; }
-            h2 { text-align: center; color: #27ae60; }
-            p { line-height: 1.8; }
-            strong { color: #27ae60; }
-          </style>
-        </head>
-        <body>
-          <div class="pdf-content">
-            <h2>${crop.localName}</h2>
-            ${crop.image ? `<img src="${crop.image}" alt="صورة المحصول">` : ''}
-            <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
-            <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
-            <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
-            <p><strong>فترة الثمار:</strong> ${crop.fruitingPeriod || 'غير محدد'}</p>
-            <p><strong>عائلة النبتة:</strong> ${crop.family || 'غير محدد'}</p>
-            <p><strong>عمر النبتة:</strong> ${crop.lifespan || 'غير محدد'}</p>
-            <p><strong>الموقع:</strong> ${crop.location || 'غير محدد'}</p>
-            <p><strong>احتياج التسميد:</strong> ${crop.fertilizationNeeds || 'غير محدد'}</p>
-          </div>
-        </body>
-        </html>
-      `);
-      doc.close();
-
-      await new Promise(resolve => {
-        const img = doc.querySelector('img');
-        if (img) {
-          img.onload = resolve;
-          if (img.complete) resolve();
-        } else {
-          resolve();
-        }
-      });
-
-      const canvas = await html2canvas(pdfFrame, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: 'white'
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.9);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
 
-      const width = pdf.internal.pageSize.getWidth();
-      const height = (canvas.height * width) / canvas.width;
-      pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
-      pdf.save(`${crop.localName}.pdf`);
+      // ملء قالب PDF
+      pdfTemplate.innerHTML = `
+        <h2 style="text-align:center; color:#27ae60;">${crop.localName}</h2>
+        ${crop.image ? `<img src="${crop.image}" style="width:100%; max-width:150px; display:block; margin:20px auto;" />` : ''}
+        <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
+        <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
+        <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
+        <p><strong>فترة الثمار:</strong> ${crop.fruitingPeriod || 'غير محدد'}</p>
+        <p><strong>عائلة النبتة:</strong> ${crop.family || 'غير محدد'}</p>
+        <p><strong>عمر النبتة:</strong> ${crop.lifespan || 'غير محدد'}</p>
+        <p><strong>الموقع:</strong> ${crop.location || 'غير محدد'}</p>
+        <p><strong>احتياج التسميد:</strong> ${crop.fertilizationNeeds || 'غير محدد'}</p>
+      `;
+
+      try {
+        // الانتظار حتى تحميل الصورة
+        const img = pdfTemplate.querySelector('img');
+        if (img) {
+          await new Promise((resolve) => {
+            img.onload = resolve;
+            if (img.complete) resolve();
+          });
+        }
+
+        // التقاط الشاشة
+        const canvas = await html2canvas(pdfTemplate, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: 'white',
+          logging: false
+        });
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.9);
+        const width = pdf.internal.pageSize.getWidth();
+        const height = (canvas.height * width) / canvas.width;
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
+        pdf.save(`${crop.localName}.pdf`);
+
+        // تنظيف القالب
+        pdfTemplate.innerHTML = '';
+
+      } catch (error) {
+        console.error('خطأ في إنشاء PDF:', error);
+        alert('فشل إنشاء PDF. تأكد من اتصال الإنترنت.');
+      }
     });
 
     // بحث
