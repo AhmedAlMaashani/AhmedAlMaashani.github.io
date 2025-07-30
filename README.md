@@ -155,7 +155,7 @@
 <body>
 
   <div class="container">
-    <h1>زراعتي 🌿</h1>
+    <h1>زراعتي </h1>
     <p>تطبيق إدارة المحاصيل الذكي</p>
     <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن محصول..." />
     <button id="addCropBtn" class="btn">➕ إضافة محصول</button>
