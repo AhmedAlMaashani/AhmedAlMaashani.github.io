@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -6,212 +5,351 @@
   <meta name="theme-color" content="#27ae60">
   <title>زراعتي - تطبيق الزراعة الذكي</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
   <style>
+    :root {
+      --primary: #27ae60;
+      --primary-dark: #219653;
+      --danger: #e74c3c;
+      --danger-dark: #c0392b;
+      --gray: #bdc3c7;
+      --light: #f4f8f7;
+      --dark: #2c3e50;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
     * {
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
       margin: 0;
-      padding: 10px;
-      background-color: #f4f8f7;
-      color: #2c3e50;
+      padding: 0;
+      font-family: 'Segoe UI', 'Amiri', sans-serif;
     }
-    h1, h2, h3 {
-      color: #27ae60;
+
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.7;
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 15px;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      color: var(--primary);
+      font-size: 1.8rem;
       margin: 10px 0;
     }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    header p {
+      color: #555;
+      font-size: 1rem;
     }
+
     .search-box {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       font-size: 16px;
-      border: 1px solid #bdc3c7;
-      border-radius: 8px;
-      margin-bottom: 15px;
+      border: 1px solid var(--gray);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      outline: none;
+      transition: all 0.3s;
     }
+
+    .search-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
+    }
+
     .btn {
-      background-color: #27ae60;
+      background-color: var(--primary);
       color: white;
       border: none;
-      padding: 10px 16px;
+      padding: 12px 20px;
       font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 5px;
-    }
-    .btn:hover { background-color: #219653; }
-    .btn-danger { background-color: #e74c3c; }
-    .btn-danger:hover { background-color: #c0392b; }
-    .btn-sm { padding: 6px 10px; font-size: 14px; }
-    .crop-card {
-      border: 1px solid #ecf0f1;
       border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      background: #f9fafa;
       cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .crop-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    }
-    .crop-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      gap: 8px;
+      transition: background 0.3s;
     }
-    .crop-image {
-      width: 60px;
-      height: 60px;
+
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger-dark);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+
+    .add-btn {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .crops-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .crop-card {
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .crop-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    .crop-img-container {
+      height: 150px;
+      overflow: hidden;
+    }
+
+    .crop-img-container img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      border-radius: 8px;
     }
+
     .crop-info {
-      margin-right: 10px;
-      flex: 1;
+      padding: 15px;
     }
+
     .crop-name {
       font-weight: bold;
-      font-size: 18px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .form-group label {
-      display: block;
+      font-size: 1.2rem;
+      color: var(--primary);
       margin-bottom: 5px;
-      font-weight: bold;
     }
-    .form-group input, .form-group textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #bdc3c7;
-      border-radius: 6px;
-      font-size: 16px;
+
+    .crop-scientific {
+      font-size: 0.9rem;
+      color: #666;
     }
+
+    .crop-actions {
+      display: flex;
+      justify-content: flex-start;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    /* نافذة الإضافة/التعديل */
     .modal {
       display: none;
       position: fixed;
       z-index: 1000;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
       background-color: rgba(0,0,0,0.5);
       overflow-y: auto;
       padding: 20px;
     }
+
     .modal-content {
       background-color: white;
       margin: 5% auto;
-      padding: 20px;
-      border-radius: 12px;
+      padding: 25px;
+      border-radius: 16px;
       width: 90%;
-      max-width: 500px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      max-width: 520px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h2 {
+      color: var(--primary);
+    }
+
     .close {
-      float: left;
       font-size: 28px;
       font-weight: bold;
       color: #aaa;
       cursor: pointer;
     }
-    .close:hover { color: #000; }
-    .crop-detail {
+
+    .close:hover {
+      color: #000;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: var(--dark);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      height: 120px;
+      object-fit: cover;
+      margin-top: 10px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    /* نافذة التفاصيل */
+    .detail-content {
       background: #f8f9fa;
       padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .detail-row {
+      display: flex;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .detail-label {
+      font-weight: bold;
+      color: var(--primary);
+      min-width: 130px;
+    }
+
+    .detail-value {
+      flex: 1;
+    }
+
+    .detail-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
       border-radius: 10px;
       margin-bottom: 15px;
     }
-    .detail-row {
+
+    .detail-actions {
       display: flex;
-      margin-bottom: 10px;
-    }
-    .detail-label {
-      font-weight: bold;
-      color: #27ae60;
-      min-width: 130px;
-    }
-    .action-buttons {
-      text-align: left;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-top: 15px;
     }
-    /* قالب PDF - نجعله مرئيًا مؤقتًا في iframe */
-    .pdf-template {
-      font-family: 'Segoe UI', sans-serif;
-      direction: rtl;
-      text-align: right;
-      padding: 20px;
-      background: white;
-      width: 180mm;
-      margin: 0 auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+
     @media (max-width: 480px) {
       .container { padding: 10px; }
-      .btn { font-size: 14px; padding: 8px 12px; }
-      .crop-name { font-size: 16px; }
-      .detail-label { min-width: 100px; }
+      .btn { font-size: 15px; padding: 10px 16px; }
+      .crop-name { font-size: 1.1rem; }
+      .modal-content { margin: 10% auto; }
+      .detail-label { min-width: 110px; }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>زراعتي 🌿</h1>
-    <p>تطبيق إدارة المحاصيل الذكي</p>
+    <header>
+      <h1>زراعتي 🌿</h1>
+      <p>تطبيق إدارة المحاصيل الذكي</p>
+    </header>
+
     <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن محصول..." />
-    <button id="addCropBtn" class="btn">➕ إضافة محصول</button>
-    <div id="cropsList"></div>
+
+    <div class="add-btn">
+      <button id="addCropBtn" class="btn">➕ إضافة محصول</button>
+    </div>
+
+    <div id="cropsList" class="crops-grid"></div>
   </div>
 
   <!-- نافذة إضافة/تعديل -->
   <div id="cropModal" class="modal">
     <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2 id="modalTitle">إضافة محصول جديد</h2>
+      <div class="modal-header">
+        <h2 id="modalTitle">إضافة محصول جديد</h2>
+        <span class="close">&times;</span>
+      </div>
       <form id="cropForm">
         <div class="form-group">
           <label>اختر صورة</label>
           <input type="file" id="cropImage" accept="image/*" />
-          <img id="preview" src="" alt="معاينة الصورة" style="max-width:100%; margin-top:10px; display:none;">
+          <img id="preview" class="preview-img" src="" alt="معاينة الصورة" />
         </div>
         <div class="form-group">
           <label>الاسم المحلي *</label>
-          <input type="text" id="localName" required>
+          <input type="text" id="localName" required />
         </div>
         <div class="form-group">
           <label>الاسم العلمي</label>
-          <input type="text" id="scientificName">
+          <input type="text" id="scientificName" />
         </div>
         <div class="form-group">
           <label>فترة التزهير</label>
-          <input type="text" id="floweringPeriod">
+          <input type="text" id="floweringPeriod" />
         </div>
         <div class="form-group">
           <label>فترة الثمار</label>
-          <input type="text" id="fruitingPeriod">
+          <input type="text" id="fruitingPeriod" />
         </div>
         <div class="form-group">
           <label>عائلة النبتة</label>
-          <input type="text" id="family">
+          <input type="text" id="family" />
         </div>
         <div class="form-group">
           <label>عمر النبتة</label>
-          <input type="text" id="lifespan">
+          <input type="text" id="lifespan" />
         </div>
         <div class="form-group">
           <label>الموقع</label>
-          <input type="text" id="location">
+          <input type="text" id="location" />
         </div>
         <div class="form-group">
           <label>احتياج التسميد</label>
@@ -225,10 +363,12 @@
   <!-- نافذة التفاصيل -->
   <div id="detailModal" class="modal">
     <div class="modal-content">
-      <span class="close-detail">&times;</span>
-      <h2 id="detailTitle">تفاصيل المحصول</h2>
-      <div id="detailContent" class="crop-detail"></div>
-      <div class="action-buttons">
+      <div class="modal-header">
+        <h2 id="detailTitle">تفاصيل المحصول</h2>
+        <span class="close-detail">&times;</span>
+      </div>
+      <div id="detailContent" class="detail-content"></div>
+      <div class="detail-actions">
         <button id="editCropBtn" class="btn btn-sm">✏️ تعديل</button>
         <button id="deleteCropBtn" class="btn btn-sm btn-danger">🗑️ حذف</button>
         <button id="copyToClipboard" class="btn btn-sm">📋 نسخ</button>
@@ -237,9 +377,9 @@
     </div>
   </div>
 
-  <!-- محتوى مؤقت لـ PDF (مرئي فقط عند الإنشاء) -->
-  <div id="pdfContainer" style="position:fixed; top:-9999px; left:-9999px; width:0; height:0; overflow:hidden;">
-    <iframe id="pdfFrame" style="width:180mm; height:297mm; border:none;"></iframe>
+  <!-- قالب PDF مؤقت -->
+  <div id="pdfContainer" style="position:fixed; top:-9999px; left:-9999px; width:0; height:0;">
+    <iframe id="pdfFrame" style="width:180mm; height:297mm;"></iframe>
   </div>
 
   <!-- تحميل المكتبات -->
@@ -249,7 +389,7 @@
   <script>
     // التحقق من دعم localStorage
     if (typeof localStorage === 'undefined') {
-      alert('متصفحك لا يدعم التخزين. استخدم Chrome.');
+      alert('متصفحك لا يدعم التخزين المحلي.');
     }
 
     // تسجيل Service Worker
@@ -410,7 +550,7 @@
 
     // حذف المحصول
     function deleteCrop(id) {
-      if (confirm('هل أنت متأكد من الحذف؟')) {
+      if (confirm('هل أنت متأكد من حذف هذا المحصول؟')) {
         crops = crops.filter(c => c.id !== id);
         localStorage.setItem('crops', JSON.stringify(crops));
         detailModal.style.display = 'none';
@@ -429,7 +569,10 @@
       );
 
       if (filtered.length === 0) {
-        cropsList.innerHTML = '<p>لا توجد محاصيل. أضف واحدًا!</p>';
+        cropsList.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; color: #777; padding: 40px;">
+            <p>لا توجد محاصيل. أضف واحدًا!</p>
+          </div>`;
         return;
       }
 
@@ -437,16 +580,16 @@
         const div = document.createElement('div');
         div.className = 'crop-card';
         div.innerHTML = `
-          <div class="crop-header">
-            <div class="crop-info">
-              <div class="crop-name">${crop.localName}</div>
-              <small>${crop.scientificName || 'لا يوجد اسم علمي'}</small>
-            </div>
-            <img src="${crop.image || 'https://via.placeholder.com/60'}" class="crop-image">
+          <div class="crop-img-container">
+            <img src="${crop.image || 'https://via.placeholder.com/300x150?text=لا+صورة'}" alt="${crop.localName}" />
           </div>
-          <div style="text-align:left; margin-top:10px;">
-            <button data-id="${crop.id}" class="edit-btn btn btn-sm">✏️</button>
-            <button data-id="${crop.id}" class="delete-btn btn btn-sm btn-danger">🗑️</button>
+          <div class="crop-info">
+            <div class="crop-name">${crop.localName}</div>
+            <div class="crop-scientific">${crop.scientificName || 'لا يوجد اسم علمي'}</div>
+            <div class="crop-actions">
+              <button data-id="${crop.id}" class="edit-btn btn btn-sm">✏️</button>
+              <button data-id="${crop.id}" class="delete-btn btn btn-sm btn-danger">🗑️</button>
+            </div>
           </div>
         `;
         div.querySelector('.edit-btn').onclick = (e) => {
@@ -467,15 +610,39 @@
       currentCropId = crop.id;
       const detailContent = document.getElementById('detailContent');
       detailContent.innerHTML = `
-        ${crop.image ? `<img src="${crop.image}" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : ''}
-        <div class="detail-row"><div class="detail-label">الاسم المحلي:</div> <div>${crop.localName}</div></div>
-        <div class="detail-row"><div class="detail-label">الاسم العلمي:</div> <div>${crop.scientificName || 'غير محدد'}</div></div>
-        <div class="detail-row"><div class="detail-label">فترة التزهير:</div> <div>${crop.floweringPeriod || 'غير محدد'}</div></div>
-        <div class="detail-row"><div class="detail-label">فترة الثمار:</div> <div>${crop.fruitingPeriod || 'غير محدد'}</div></div>
-        <div class="detail-row"><div class="detail-label">عائلة النبتة:</div> <div>${crop.family || 'غير محدد'}</div></div>
-        <div class="detail-row"><div class="detail-label">عمر النبتة:</div> <div>${crop.lifespan || 'غير محدد'}</div></div>
-        <div class="detail-row"><div class="detail-label">الموقع:</div> <div>${crop.location || 'غير محدد'}</div></div>
-        <div class="detail-row"><div class="detail-label">احتياج التسميد:</div> <div>${crop.fertilizationNeeds || 'غير محدد'}</div></div>
+        ${crop.image ? `<img src="${crop.image}" class="detail-img" alt="${crop.localName}" />` : ''}
+        <div class="detail-row">
+          <div class="detail-label">الاسم المحلي:</div>
+          <div class="detail-value">${crop.localName}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">الاسم العلمي:</div>
+          <div class="detail-value">${crop.scientificName || 'غير محدد'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">فترة التزهير:</div>
+          <div class="detail-value">${crop.floweringPeriod || 'غير محدد'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">فترة الثمار:</div>
+          <div class="detail-value">${crop.fruitingPeriod || 'غير محدد'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">عائلة النبتة:</div>
+          <div class="detail-value">${crop.family || 'غير محدد'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">عمر النبتة:</div>
+          <div class="detail-value">${crop.lifespan || 'غير محدد'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">الموقع:</div>
+          <div class="detail-value">${crop.location || 'غير محدد'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">احتياج التسميد:</div>
+          <div class="detail-value">${crop.fertilizationNeeds || 'غير محدد'}</div>
+        </div>
       `;
       document.getElementById('detailTitle').textContent = crop.localName;
       detailModal.style.display = 'block';
@@ -506,7 +673,6 @@
       const crop = crops.find(c => c.id === currentCropId);
       const { jsPDF } = window.jspdf;
 
-      // إنشاء محتوى داخل iframe
       const doc = pdfFrame.contentDocument || pdfFrame.contentWindow.document;
       doc.open();
       doc.write(`
@@ -516,14 +682,17 @@
           <meta charset="UTF-8">
           <style>
             body { font-family: 'Segoe UI', sans-serif; direction: rtl; text-align: right; margin: 0; padding: 20px; background: white; }
-            .pdf-template { width: 180mm; margin: 0 auto; }
-            img { max-width: 100%; height: auto; }
+            .pdf-content { width: 180mm; margin: 0 auto; }
+            img { max-width: 100%; height: auto; margin: 20px auto; display: block; }
+            h2 { text-align: center; color: #27ae60; }
+            p { line-height: 1.8; }
+            strong { color: #27ae60; }
           </style>
         </head>
         <body>
-          <div class="pdf-template">
-            <h2 style="text-align:center;">${crop.localName}</h2>
-            ${crop.image ? `<img src="${crop.image}" style="display:block; margin:20px auto; max-width:150px;">` : ''}
+          <div class="pdf-content">
+            <h2>${crop.localName}</h2>
+            ${crop.image ? `<img src="${crop.image}" alt="صورة المحصول">` : ''}
             <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
             <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
             <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
@@ -538,7 +707,6 @@
       `);
       doc.close();
 
-      // الانتظار حتى تحميل الصورة
       await new Promise(resolve => {
         const img = doc.querySelector('img');
         if (img) {
@@ -549,12 +717,10 @@
         }
       });
 
-      // التقاط الشاشة
       const canvas = await html2canvas(pdfFrame, {
         scale: 2,
         useCORS: true,
-        backgroundColor: 'white',
-        logging: false
+        backgroundColor: 'white'
       });
 
       const imgData = canvas.toDataURL('image/jpeg', 0.9);
