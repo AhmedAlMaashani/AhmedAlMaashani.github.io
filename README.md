@@ -135,7 +135,7 @@
       margin-top: 10px;
     }
 
-    /* نافذة الإضافة/التعديل */
+    /* نافذة التفاصيل */
     .modal {
       display: none;
       position: fixed;
@@ -155,7 +155,7 @@
       padding: 25px;
       border-radius: 16px;
       width: 90%;
-      max-width: 600px;
+      max-width: 520px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
@@ -202,25 +202,18 @@
       outline: none;
     }
 
-    .preview-container {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      flex-wrap: wrap;
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
     }
 
     .preview-img {
-      width: 100px;
-      height: 100px;
+      max-width: 100%;
+      height: 120px;
       object-fit: cover;
+      margin-top: 10px;
       border-radius: 8px;
-      border: 2px solid var(--primary);
-    }
-
-    .preview-box {
       display: none;
-      flex-direction: column;
-      gap: 5px;
     }
 
     /* تفاصيل المحصول */
@@ -231,24 +224,12 @@
       margin-bottom: 20px;
     }
 
-    .detail-imgs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-
     .detail-img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
       border-radius: 10px;
-    }
-
-    .img-label {
-      font-weight: bold;
-      color: var(--primary);
-      margin: 10px 0 5px;
+      margin-bottom: 15px;
     }
 
     .detail-row {
@@ -272,7 +253,7 @@
       gap: 10px;
     }
 
-    /* قالب PDF */
+    /* قالب PDF - يجب أن يكون مرئيًا تقنيًا */
     #pdfContainer {
       position: absolute;
       top: -9999px;
@@ -285,14 +266,6 @@
       direction: rtl;
       font-family: 'Segoe UI', sans-serif;
       z-index: -1;
-    }
-
-    .pdf-img {
-      width: 100%;
-      max-width: 160px;
-      height: auto;
-      border: 1px solid #ddd;
-      border-radius: 8px;
     }
   </style>
 </head>
@@ -322,28 +295,9 @@
       </div>
       <form id="cropForm">
         <div class="form-group">
-          <label>صورة عامة للنبتة</label>
-          <input type="file" id="plantImage" accept="image/*" />
-          <div class="preview-box" id="plantPreviewBox">
-            <span>النبتة</span>
-            <img id="plantPreview" class="preview-img" src="" alt="صورة النبتة" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>صورة الزهرة</label>
-          <input type="file" id="flowerImage" accept="image/*" />
-          <div class="preview-box" id="flowerPreviewBox">
-            <span>الزهرة</span>
-            <img id="flowerPreview" class="preview-img" src="" alt="صورة الزهرة" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>صورة الثمرة</label>
-          <input type="file" id="fruitImage" accept="image/*" />
-          <div class="preview-box" id="fruitPreviewBox">
-            <span>الثمرة</span>
-            <img id="fruitPreview" class="preview-img" src="" alt="صورة الثمرة" />
-          </div>
+          <label>اختر صورة</label>
+          <input type="file" id="cropImage" accept="image/*" />
+          <img id="preview" class="preview-img" src="" alt="معاينة الصورة" />
         </div>
         <div class="form-group">
           <label>الاسم المحلي *</label>
@@ -399,7 +353,7 @@
     </div>
   </div>
 
-  <!-- قالب PDF -->
+  <!-- قالب PDF (يجب أن يكون مرئيًا تقنيًا) -->
   <div id="pdfContainer"></div>
 
   <!-- تحميل المكتبات -->
@@ -429,41 +383,23 @@
     const cropModal = document.getElementById('cropModal');
     const detailModal = document.getElementById('detailModal');
     const cropForm = document.getElementById('cropForm');
+    const preview = document.getElementById('preview');
+    const cropImage = document.getElementById('cropImage');
     const pdfContainer = document.getElementById('pdfContainer');
 
-    // عناصر الصور
-    const plantImage = document.getElementById('plantImage');
-    const flowerImage = document.getElementById('flowerImage');
-    const fruitImage = document.getElementById('fruitImage');
-
-    const plantPreview = document.getElementById('plantPreview');
-    const flowerPreview = document.getElementById('flowerPreview');
-    const fruitPreview = document.getElementById('fruitPreview');
-
-    const plantPreviewBox = document.getElementById('plantPreviewBox');
-    const flowerPreviewBox = document.getElementById('flowerPreviewBox');
-    const fruitPreviewBox = document.getElementById('fruitPreviewBox');
-
-    // عرض الصور
-    function setupImagePreview(input, preview, box) {
-      input.addEventListener('change', () => {
-        const file = input.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-            box.style.display = 'flex';
-          };
-          reader.onerror = () => alert('فشل تحميل الصورة');
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-
-    setupImagePreview(plantImage, plantPreview, plantPreviewBox);
-    setupImagePreview(flowerImage, flowerPreview, flowerPreviewBox);
-    setupImagePreview(fruitImage, fruitPreview, fruitPreviewBox);
+    // عرض الصورة
+    cropImage.addEventListener('change', () => {
+      const file = cropImage.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.onerror = () => alert('فشل تحميل الصورة');
+        reader.readAsDataURL(file);
+      }
+    });
 
     // فتح/إغلاق النافذات
     addCropBtn.onclick = () => openCropModal();
@@ -477,10 +413,7 @@
     // فتح نافذة الإضافة أو التعديل
     function openCropModal(crop = null) {
       cropForm.reset();
-      plantPreviewBox.style.display = 'none';
-      flowerPreviewBox.style.display = 'none';
-      fruitPreviewBox.style.display = 'none';
-
+      preview.style.display = 'none';
       document.getElementById('modalTitle').textContent = crop ? 'تعديل المحصول' : 'إضافة محصول جديد';
       currentCropId = crop ? crop.id : null;
 
@@ -493,19 +426,9 @@
         document.getElementById('lifespan').value = crop.lifespan || '';
         document.getElementById('location').value = crop.location || '';
         document.getElementById('fertilizationNeeds').value = crop.fertilizationNeeds || '';
-
-        // عرض الصور الحالية
-        if (crop.plantImage) {
-          plantPreview.src = crop.plantImage;
-          plantPreviewBox.style.display = 'flex';
-        }
-        if (crop.flowerImage) {
-          flowerPreview.src = crop.flowerImage;
-          flowerPreviewBox.style.display = 'flex';
-        }
-        if (crop.fruitImage) {
-          fruitPreview.src = crop.fruitImage;
-          fruitPreviewBox.style.display = 'flex';
+        if (crop.image) {
+          preview.src = crop.image;
+          preview.style.display = 'block';
         }
       }
       cropModal.style.display = 'block';
@@ -556,41 +479,22 @@
         return;
       }
 
-      const plantFile = plantImage.files[0];
-      const flowerFile = flowerImage.files[0];
-      const fruitFile = fruitImage.files[0];
+      const file = cropImage.files[0];
+      let imageUrl = currentCropId ? crops.find(c => c.id === currentCropId)?.image : '';
 
-      let plantImageURL = currentCropId ? (crops.find(c => c.id === currentCropId)?.plantImage || '') : '';
-      let flowerImageURL = currentCropId ? (crops.find(c => c.id === currentCropId)?.flowerImage || '') : '';
-      let fruitImageURL = currentCropId ? (crops.find(c => c.id === currentCropId)?.fruitImage || '') : '';
-
-      if (plantFile) {
+      if (file) {
         try {
-          const compressed = await compressImage(plantFile);
-          plantImageURL = await toBase64(compressed);
+          const compressedFile = await compressImage(file);
+          imageUrl = await toBase64(compressedFile);
         } catch (error) {
-          alert('فشل تحميل صورة النبتة');
-        }
-      }
-      if (flowerFile) {
-        try {
-          const compressed = await compressImage(flowerFile);
-          flowerImageURL = await toBase64(compressed);
-        } catch (error) {
-          alert('فشل تحميل صورة الزهرة');
-        }
-      }
-      if (fruitFile) {
-        try {
-          const compressed = await compressImage(fruitFile);
-          fruitImageURL = await toBase64(compressed);
-        } catch (error) {
-          alert('فشل تحميل صورة الثمرة');
+          alert('فشل تحميل الصورة. حاول صورة أصغر.');
+          return;
         }
       }
 
       const cropData = {
         id: currentCropId || Date.now().toString(),
+        image: imageUrl,
         localName,
         scientificName: document.getElementById('scientificName').value,
         floweringPeriod: document.getElementById('floweringPeriod').value,
@@ -599,9 +503,6 @@
         lifespan: document.getElementById('lifespan').value,
         location: document.getElementById('location').value,
         fertilizationNeeds: document.getElementById('fertilizationNeeds').value,
-        plantImage: plantImageURL,
-        flowerImage: flowerImageURL,
-        fruitImage: fruitImageURL,
       };
 
       if (currentCropId) {
@@ -653,7 +554,7 @@
         div.className = 'crop-card';
         div.innerHTML = `
           <div class="crop-img-container">
-            <img src="${crop.plantImage || crop.flowerImage || crop.fruitImage || 'https://via.placeholder.com/300x150?text=لا+صورة'}" alt="${crop.localName}" />
+            <img src="${crop.image || 'https://via.placeholder.com/300x150?text=لا+صورة'}" alt="${crop.localName}" />
           </div>
           <div class="crop-info">
             <div class="crop-name">${crop.localName}</div>
@@ -681,23 +582,8 @@
     function showCropDetail(crop) {
       currentCropId = crop.id;
       const detailContent = document.getElementById('detailContent');
-      let imagesHtml = '';
-      if (crop.plantImage || crop.flowerImage || crop.fruitImage) {
-        imagesHtml += '<div class="detail-imgs">';
-        if (crop.plantImage) {
-          imagesHtml += `<div><div class="img-label">صورة النبتة</div><img src="${crop.plantImage}" class="detail-img" alt="صورة النبتة" /></div>`;
-        }
-        if (crop.flowerImage) {
-          imagesHtml += `<div><div class="img-label">صورة الزهرة</div><img src="${crop.flowerImage}" class="detail-img" alt="صورة الزهرة" /></div>`;
-        }
-        if (crop.fruitImage) {
-          imagesHtml += `<div><div class="img-label">صورة الثمرة</div><img src="${crop.fruitImage}" class="detail-img" alt="صورة الثمرة" /></div>`;
-        }
-        imagesHtml += '</div>';
-      }
-
       detailContent.innerHTML = `
-        ${imagesHtml}
+        ${crop.image ? `<img src="${crop.image}" class="detail-img" alt="${crop.localName}" />` : ''}
         <div class="detail-row">
           <div class="detail-label">الاسم المحلي:</div>
           <div class="detail-value">${crop.localName}</div>
@@ -755,7 +641,7 @@
       deleteCrop(currentCropId);
     });
 
-    // تنزيل كـ PDF (احترافي)
+    // تنزيل كـ PDF (الحل النهائي والاحترافي)
     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
       const crop = crops.find(c => c.id === currentCropId);
       if (!crop) return;
@@ -773,11 +659,7 @@
           <h1 style="color: #27ae60; font-size: 24px; margin: 0;">تقرير المحصول</h1>
           <h2 style="font-size: 20px; margin: 10px 0;">${crop.localName}</h2>
         </div>
-        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-          ${crop.plantImage ? `<div><div style="font-weight:bold; margin-bottom:8px;">صورة النبتة</div><img src="${crop.plantImage}" class="pdf-img" /></div>` : ''}
-          ${crop.flowerImage ? `<div><div style="font-weight:bold; margin-bottom:8px;">صورة الزهرة</div><img src="${crop.flowerImage}" class="pdf-img" /></div>` : ''}
-          ${crop.fruitImage ? `<div><div style="font-weight:bold; margin-bottom:8px;">صورة الثمرة</div><img src="${crop.fruitImage}" class="pdf-img" /></div>` : ''}
-        </div>
+        ${crop.image ? `<img src="${crop.image}" style="width: 100%; max-width: 180px; height: auto; display: block; margin: 20px auto; border: 1px solid #ddd; border-radius: 8px;" />` : ''}
         <div style="margin: 20px 0; line-height: 2; font-size: 14px;">
           <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
           <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
@@ -794,20 +676,21 @@
       `;
 
       try {
-        const imgElements = pdfContainer.querySelectorAll('img');
-        if (imgElements.length > 0) {
-          await Promise.all(Array.from(imgElements).map(img => {
-            return new Promise((resolve) => {
-              if (img.complete) resolve();
-              else img.onload = resolve;
-            });
-          }));
+        // الانتظار حتى تحميل الصورة
+        const img = pdfContainer.querySelector('img');
+        if (img) {
+          await new Promise((resolve) => {
+            if (img.complete) resolve();
+            else img.onload = resolve;
+          });
         }
 
+        // التقاط الشاشة
         const canvas = await html2canvas(pdfContainer, {
           scale: 3,
           useCORS: true,
-          backgroundColor: 'white'
+          backgroundColor: 'white',
+          logging: false
         });
 
         const imgData = canvas.toDataURL('image/jpeg', 0.9);
@@ -817,6 +700,7 @@
         pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
         pdf.save(`${crop.localName}.pdf`);
 
+        // تنظيف القالب بعد الإنشاء
         pdfContainer.innerHTML = '';
 
       } catch (error) {
