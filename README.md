@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -9,10 +8,6 @@
   <style>
     :root {
       --primary: #27ae60;
-      --primary-dark: #219653;
-      --danger: #e74c3c;
-      --danger-dark: #c0392b;
-      --gray: #bdc3c7;
       --light: #f4f8f7;
       --dark: #2c3e50;
       --shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -22,13 +17,13 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', 'Tahoma', sans-serif;
     }
 
     body {
       background-color: var(--light);
       color: var(--dark);
-      line-height: 1.7;
+      line-height: 1.6;
     }
 
     .container {
@@ -51,7 +46,7 @@
       width: 100%;
       padding: 14px;
       font-size: 16px;
-      border: 1px solid var(--gray);
+      border: 1px solid #bdc3c7;
       border-radius: 12px;
       margin-bottom: 20px;
       outline: none;
@@ -68,15 +63,15 @@
     }
 
     .btn:hover {
-      background-color: var(--primary-dark);
+      background-color: #219653;
     }
 
     .btn-danger {
-      background-color: var(--danger);
+      background-color: #e74c3c;
     }
 
     .btn-danger:hover {
-      background-color: var(--danger-dark);
+      background-color: #c0392b;
     }
 
     .btn-sm {
@@ -85,9 +80,8 @@
     }
 
     .add-btn {
+      text-align: center;
       margin-bottom: 20px;
-      display: flex;
-      justify-content: center;
     }
 
     .crops-grid {
@@ -141,7 +135,7 @@
       margin-top: 10px;
     }
 
-    /* النماذج */
+    /* نافذة التفاصيل */
     .modal {
       display: none;
       position: fixed;
@@ -202,7 +196,7 @@
     .form-group textarea {
       width: 100%;
       padding: 12px;
-      border: 1px solid var(--gray);
+      border: 1px solid #bdc3c7;
       border-radius: 8px;
       font-size: 16px;
       outline: none;
@@ -230,6 +224,14 @@
       margin-bottom: 20px;
     }
 
+    .detail-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
     .detail-row {
       display: flex;
       margin-bottom: 12px;
@@ -245,31 +247,25 @@
       flex: 1;
     }
 
-    .detail-img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-
     .detail-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
     }
 
-    /* قالب PDF - لا تستخدم display: none */
-    #pdfTemplate {
+    /* قالب PDF - يجب أن يكون مرئيًا تقنيًا */
+    #pdfContainer {
       position: absolute;
       top: -9999px;
       left: -9999px;
-      width: 180mm;
+      width: 210mm;
+      min-height: 297mm;
       background: white;
-      padding: 20px;
+      padding: 25px;
+      box-sizing: border-box;
       direction: rtl;
-      text-align: right;
       font-family: 'Segoe UI', sans-serif;
+      z-index: -1;
     }
   </style>
 </head>
@@ -290,7 +286,7 @@
     <div id="cropsList" class="crops-grid"></div>
   </div>
 
-  <!-- نافذة إضافة/تعديل -->
+  <!-- نافذة الإضافة/التعديل -->
   <div id="cropModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -357,8 +353,8 @@
     </div>
   </div>
 
-  <!-- قالب PDF (مرئي تقنيًا لكن خارج الشاشة) -->
-  <div id="pdfTemplate"></div>
+  <!-- قالب PDF (يجب أن يكون مرئيًا تقنيًا) -->
+  <div id="pdfContainer"></div>
 
   <!-- تحميل المكتبات -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -389,7 +385,7 @@
     const cropForm = document.getElementById('cropForm');
     const preview = document.getElementById('preview');
     const cropImage = document.getElementById('cropImage');
-    const pdfTemplate = document.getElementById('pdfTemplate');
+    const pdfContainer = document.getElementById('pdfContainer');
 
     // عرض الصورة
     cropImage.addEventListener('change', () => {
@@ -645,7 +641,7 @@
       deleteCrop(currentCropId);
     });
 
-    // تنزيل كـ PDF (الحل النهائي)
+    // تنزيل كـ PDF (الحل النهائي والاحترافي)
     document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
       const crop = crops.find(c => c.id === currentCropId);
       if (!crop) return;
@@ -657,33 +653,41 @@
         format: 'a4'
       });
 
-      // ملء قالب PDF
-      pdfTemplate.innerHTML = `
-        <h2 style="text-align:center; color:#27ae60;">${crop.localName}</h2>
-        ${crop.image ? `<img src="${crop.image}" style="width:100%; max-width:150px; display:block; margin:20px auto;" />` : ''}
-        <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
-        <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
-        <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
-        <p><strong>فترة الثمار:</strong> ${crop.fruitingPeriod || 'غير محدد'}</p>
-        <p><strong>عائلة النبتة:</strong> ${crop.family || 'غير محدد'}</p>
-        <p><strong>عمر النبتة:</strong> ${crop.lifespan || 'غير محدد'}</p>
-        <p><strong>الموقع:</strong> ${crop.location || 'غير محدد'}</p>
-        <p><strong>احتياج التسميد:</strong> ${crop.fertilizationNeeds || 'غير محدد'}</p>
+      // إعداد القالب
+      pdfContainer.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #27ae60; font-size: 24px; margin: 0;">تقرير المحصول</h1>
+          <h2 style="font-size: 20px; margin: 10px 0;">${crop.localName}</h2>
+        </div>
+        ${crop.image ? `<img src="${crop.image}" style="width: 100%; max-width: 180px; height: auto; display: block; margin: 20px auto; border: 1px solid #ddd; border-radius: 8px;" />` : ''}
+        <div style="margin: 20px 0; line-height: 2; font-size: 14px;">
+          <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
+          <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
+          <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
+          <p><strong>فترة الثمار:</strong> ${crop.fruitingPeriod || 'غير محدد'}</p>
+          <p><strong>عائلة النبتة:</strong> ${crop.family || 'غير محدد'}</p>
+          <p><strong>عمر النبتة:</strong> ${crop.lifespan || 'غير محدد'}</p>
+          <p><strong>الموقع:</strong> ${crop.location || 'غير محدد'}</p>
+          <p><strong>احتياج التسميد:</strong> ${crop.fertilizationNeeds || 'غير محدد'}</p>
+        </div>
+        <div style="text-align: center; margin-top: 40px; color: #666; font-size: 12px; border-top: 1px solid #eee; padding-top: 15px;">
+          تم إنشاء هذا التقرير باستخدام تطبيق زراعتي الذكي
+        </div>
       `;
 
       try {
         // الانتظار حتى تحميل الصورة
-        const img = pdfTemplate.querySelector('img');
+        const img = pdfContainer.querySelector('img');
         if (img) {
           await new Promise((resolve) => {
-            img.onload = resolve;
             if (img.complete) resolve();
+            else img.onload = resolve;
           });
         }
 
         // التقاط الشاشة
-        const canvas = await html2canvas(pdfTemplate, {
-          scale: 2,
+        const canvas = await html2canvas(pdfContainer, {
+          scale: 3,
           useCORS: true,
           backgroundColor: 'white',
           logging: false
@@ -696,12 +700,12 @@
         pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
         pdf.save(`${crop.localName}.pdf`);
 
-        // تنظيف القالب
-        pdfTemplate.innerHTML = '';
+        // تنظيف القالب بعد الإنشاء
+        pdfContainer.innerHTML = '';
 
       } catch (error) {
         console.error('خطأ في إنشاء PDF:', error);
-        alert('فشل إنشاء PDF. تأكد من اتصال الإنترنت.');
+        alert('فشل إنشاء PDF. تأكد من اتصال الإنترنت وحاول مرة أخرى.');
       }
     });
 
