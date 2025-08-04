@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -799,7 +800,10 @@
         // التقاط صورة
         function captureImage() {
             const video = document.getElementById('camera-preview');
-            if (!video.srcObject) return alert('الكاميرا غير متاحة');
+            if (!video.srcObject) {
+                alert('الكاميرا غير متاحة');
+                return;
+            }
             const canvas = document.createElement('canvas');
             canvas.width = 640;
             canvas.height = 480;
@@ -811,28 +815,56 @@
 
         // رفع صور من الجهاز
         function handleFileSelect(e) {
-            Array.from(e.target.files).forEach(file => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            
+            Array.from(files).forEach(file => {
                 const reader = new FileReader();
-                reader.onload = (event) => addImageToContainer(event.target.result);
+                reader.onload = function(event) {
+                    addImageToContainer(event.target.result);
+                };
                 reader.readAsDataURL(file);
             });
         }
 
         // إضافة صورة
         function addImageToContainer(src) {
-            const div = document.createElement('div');
-            div.className = 'image-container';
-            div.innerHTML = `
-                <img src="${src}" alt="Image">
-                <button class="delete-image" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-            `;
-            document.getElementById('captured-images').appendChild(div);
+            if (!src) return;
+            
+            const container = document.createElement('div');
+            container.className = 'image-container';
+            
+            const img = document.createElement('img');
+            img.src = src;
+            img.onload = function() {
+                // التأكد من أن الصورة تظهر
+                console.log('Image loaded:', src.substring(0, 50) + '...');
+            };
+            img.onerror = function() {
+                console.error('Failed to load image:', src.substring(0, 50) + '...');
+            };
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-image';
+            deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+            deleteBtn.onclick = function() {
+                container.remove();
+            };
+            
+            container.appendChild(img);
+            container.appendChild(deleteBtn);
+            document.getElementById('captured-images').appendChild(container);
         }
 
         // حفظ السجل
         document.getElementById('pestForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const form = this;
+            
+            // جمع الصور
+            const imageElements = document.querySelectorAll('#captured-images .image-container img');
+            const images = Array.from(imageElements).map(img => img.src);
+            
             const formData = {
                 id: Date.now().toString(),
                 date: form['discovery-date'].value,
@@ -843,15 +875,29 @@
                 pesticide: form['pesticide'].value,
                 notes: form['notes'].value,
                 recordedBy: form['recorded-by'].value,
-                images: Array.from(document.querySelectorAll('#captured-images img')).map(img => img.src),
+                images: images,
                 createdAt: new Date().toISOString()
             };
+            
+            // إضافة السجل إلى القائمة
             records.unshift(formData);
-            localStorage.setItem('pestRecords', JSON.stringify(records));
-            alert('تم حفظ السجل بنجاح!');
+            
+            // حفظ في localStorage
+            try {
+                localStorage.setItem('pestRecords', JSON.stringify(records));
+                alert('تم حفظ السجل بنجاح!');
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+                alert('حدث خطأ في حفظ البيانات. تأكد من أن المتصفح يدعم التخزين المحلي.');
+                return;
+            }
+            
+            // إعادة تعيين النموذج
             form.reset();
             document.getElementById('discovery-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('captured-images').innerHTML = '';
+            
+            // التبديل إلى قائمة السجلات
             showSection('records-section');
         });
 
@@ -890,11 +936,11 @@
         }
 
         function renderPagination() {
-            const pages = Math.ceil(records.length / recordsPerPage);
+            const totalPages = Math.ceil(records.length / recordsPerPage);
             const div = document.getElementById('pagination');
             div.innerHTML = '';
-            if (pages <= 1) return;
-            for (let i = 1; i <= pages; i++) {
+            if (totalPages <= 1) return;
+            for (let i = 1; i <= totalPages; i++) {
                 const btn = document.createElement('button');
                 btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
                 btn.textContent = i;
@@ -916,7 +962,7 @@
                 <div class="detail-row"><div class="detail-label" lang="ar">المبيد:</div><div class="detail-value">${r.pesticide || '—'}</div></div>
                 <div class="detail-row"><div class="detail-label" lang="ar">ملاحظات:</div><div class="detail-value">${r.notes || '—'}</div></div>
                 <h3 lang="ar">صور الإصابة:</h3>
-                <div class="detail-images">${r.images.map(s => `<img src="${s}" class="detail-image">`).join('') || 'لا توجد صور'}</div>
+                <div class="detail-images">${r.images && r.images.length > 0 ? r.images.map(s => `<img src="${s}" class="detail-image">`).join('') : 'لا توجد صور'}</div>
             `;
             switchLanguage(currentLanguage);
             showSection('record-details-section');
@@ -981,30 +1027,32 @@
             
             try {
                 // تحويل HTML إلى صورة باستخدام html2canvas
-                const canvas = await html2canvas(tempDiv, {
+                html2canvas(tempDiv, {
                     scale: 2,
                     useCORS: true,
                     allowTaint: true,
                     logging: false,
                     backgroundColor: 'white'
+                }).then(canvas => {
+                    // إنشاء PDF من الصورة
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+                    
+                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                    pdf.save(`${r.pestName}_${r.date}.pdf`);
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    alert('حدث خطأ أثناء إنشاء الملف. يرجى المحاولة مرة أخرى.');
                 });
-                
-                // إنشاء PDF من الصورة
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-                
-                const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                pdf.save(`${r.pestName}_${r.date}.pdf`);
-                
             } catch (error) {
-                console.error('حدث خطأ أثناء إنشاء PDF:', error);
+                console.error('Error in generatePDF:', error);
                 alert('حدث خطأ أثناء إنشاء الملف. يرجى المحاولة مرة أخرى.');
             } finally {
                 document.body.removeChild(tempDiv);
@@ -1028,14 +1076,22 @@
             (r.images || []).forEach(src => addImageToContainer(src));
 
             records = records.filter(r => r.id !== id);
-            localStorage.setItem('pestRecords', JSON.stringify(records));
+            try {
+                localStorage.setItem('pestRecords', JSON.stringify(records));
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
             showSection('record-section');
         }
 
         function deleteRecord(id) {
             if (confirm('هل أنت متأكد من الحذف؟')) {
                 records = records.filter(r => r.id !== id);
-                localStorage.setItem('pestRecords', JSON.stringify(records));
+                try {
+                    localStorage.setItem('pestRecords', JSON.stringify(records));
+                } catch (e) {
+                    console.error('Error saving to localStorage:', e);
+                }
                 renderRecordsTable();
                 if (records.length === 0) document.getElementById('no-records').classList.remove('hidden');
             }
