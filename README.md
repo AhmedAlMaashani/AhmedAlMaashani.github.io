@@ -3,7 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام تسجيل الآفات والأمراض النباتية | Pest & Disease Recording System</title>
-    <!-- خط عربي داعم للـ PDF والعرض -->
+    <!-- خط عربي عالي الجودة -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -127,7 +127,8 @@
         input[type="text"],
         input[type="date"],
         textarea,
-        select {
+        select,
+        input[type="file"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -135,6 +136,11 @@
             box-sizing: border-box;
             font-size: 1rem;
             font-family: 'Cairo', Arial, sans-serif;
+        }
+
+        input[type="file"] {
+            background-color: #fafafa;
+            cursor: pointer;
         }
 
         textarea {
@@ -169,9 +175,9 @@
             display: block;
         }
 
-        #capture-btn {
+        .upload-btn {
             padding: 12px 24px;
-            background-color: var(--primary-color);
+            background-color: #3498db;
             color: var(--white);
             border: none;
             border-radius: 6px;
@@ -185,8 +191,9 @@
             box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         }
 
-        #capture-btn:hover {
-            background-color: #229b54;
+        #capture-btn,
+        #upload-btn {
+            margin: 0 5px;
         }
 
         #captured-images {
@@ -531,17 +538,32 @@
                     <label lang="en" class="hidden">Symptoms</label>
                     <textarea id="symptoms" placeholder="صف الأعراض بدقة..." required></textarea>
                 </div>
+
                 <div class="camera-section">
-                    <h3 lang="ar">تصوير الإصابة</h3>
-                    <h3 lang="en" class="hidden">Capture Images</h3>
+                    <h3 lang="ar">إضافة صور للإصابة</h3>
+                    <h3 lang="en" class="hidden">Add Images of the Pest</h3>
+
+                    <!-- كاميرا -->
                     <video id="camera-preview" autoplay playsinline></video>
-                    <button type="button" id="capture-btn" onclick="captureImage()">
-                        <i class="fas fa-camera"></i>
-                        <span lang="ar">التقاط صورة</span>
-                        <span lang="en" class="hidden">Capture Image</span>
-                    </button>
+                    <div>
+                        <button type="button" id="capture-btn" onclick="captureImage()">
+                            <i class="fas fa-camera"></i>
+                            <span lang="ar">التقاط صورة</span>
+                            <span lang="en" class="hidden">Capture Image</span>
+                        </button>
+
+                        <!-- رفع من الجهاز -->
+                        <label for="file-upload" class="upload-btn">
+                            <i class="fas fa-upload"></i>
+                            <span lang="ar">اختر صورة من الجهاز</span>
+                            <span lang="en" class="hidden">Choose from Device</span>
+                        </label>
+                        <input type="file" id="file-upload" accept="image/jpeg, image/png, image/jpg" class="hidden" multiple onchange="handleFileSelect(event)">
+                    </div>
+
                     <div id="captured-images"></div>
                 </div>
+
                 <div class="form-group">
                     <label lang="ar">المكافحة الكيميائية (اسم المبيد)</label>
                     <label lang="en" class="hidden">Chemical Control (Pesticide Name)</label>
@@ -616,7 +638,6 @@
         let currentPage = 1;
         const recordsPerPage = 5;
         let stream = null;
-        let currentRecordId = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
@@ -663,19 +684,35 @@
                 document.getElementById('camera-preview').srcObject = stream;
             } catch (err) {
                 console.error("Camera access error:", err);
-                alert(currentLanguage === 'ar' ? "الكاميرا غير متاحة. تأكد من الأذونات." : "Camera not available. Please check permissions.");
+                document.getElementById('camera-preview').src = '';
+                document.getElementById('camera-preview').alt = currentLanguage === 'ar' ? "الكاميرا غير متاحة" : "Camera not available";
             }
         }
 
         function captureImage() {
             const video = document.getElementById('camera-preview');
+            if (!video.srcObject) return alert(currentLanguage === 'ar' ? 'الكاميرا غير متاحة.' : 'Camera not available.');
+
             const canvas = document.createElement('canvas');
             canvas.width = 640;
             canvas.height = 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imgData = canvas.toDataURL('image/jpeg', 0.9); // جودة عالية
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
             addCapturedImage(imgData);
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addCapturedImage(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         function addCapturedImage(imgData) {
@@ -711,6 +748,7 @@
             localStorage.setItem('pestRecords', JSON.stringify(records));
             alert(currentLanguage === 'ar' ? 'تم حفظ السجل بنجاح!' : 'Record saved successfully!');
             this.reset();
+            document.getElementById('file-upload').value = '';
             document.getElementById('captured-images').innerHTML = '';
             document.getElementById('discovery-date').value = new Date().toISOString().split('T')[0];
             showSection('records-section');
@@ -779,7 +817,7 @@
                 <h3 lang="ar">صور الإصابة:</h3>
                 <div class="detail-images">${record.images?.length ? record.images.map(src => `<img src="${src}" class="detail-image">`).join('') : (currentLanguage === 'ar' ? 'لا توجد صور' : 'No images')}</div>
             `;
-            switchLanguage(currentLanguage); // تأكد من تحديث اللغة
+            switchLanguage(currentLanguage);
             showSection('record-details-section');
         }
 
@@ -794,7 +832,7 @@
                 format: 'a4'
             });
 
-            // تضمين الخط العربي (مهم للعرض الصحيح)
+            // تعيين الخط العربي
             doc.setFont('Cairo');
 
             // العنوان
@@ -816,11 +854,9 @@
             doc.text(`${currentLanguage === 'ar' ? 'المحصول:' : 'Crop:'} ${record.affectedCrop}`, leftMargin, y); y += 15;
 
             // الأعراض
-            doc.text(`${currentLanguage === 'ar' ? 'أعراض الإصابة:' : 'Symptoms:'}`, leftMargin, y);
-            y += 8;
+            doc.text(`${currentLanguage === 'ar' ? 'أعراض الإصابة:' : 'Symptoms:'}`, leftMargin, y); y += 8;
             const symptomsLines = doc.splitTextToSize(record.symptoms, maxWidth);
-            doc.text(symptomsLines, leftMargin, y);
-            y += symptomsLines.length * 6 + 10;
+            doc.text(symptomsLines, leftMargin, y); y += symptomsLines.length * 6 + 10;
 
             if (record.pesticide) {
                 doc.text(`${currentLanguage === 'ar' ? 'المبيد المستخدم:' : 'Pesticide Used:'} ${record.pesticide}`, leftMargin, y); y += 15;
@@ -846,7 +882,6 @@
 
                     doc.addImage(img, 'JPEG', 20, y, 80, 80);
                     if (index % 2 === 0 && index < record.images.length - 1) {
-                        // صورة ثانية في نفس الصفحة
                         doc.addImage(record.images[index + 1], 'JPEG', 110, y, 80, 80);
                     }
                     y += 90;
@@ -859,15 +894,6 @@
         function editRecord(recordId) {
             const record = records.find(r => r.id === recordId);
             if (!record) return;
-            Object.assign(document, {
-                'discovery-date': record.date,
-                'pest-name': record.pestName,
-                'scientific-name': record.scientificName || '',
-                'affected-crop': record.affectedCrop,
-                'symptoms': record.symptoms,
-                'pesticide': record.pesticide || '',
-                'notes': record.notes || ''
-            });
             document.getElementById('discovery-date').value = record.date;
             document.getElementById('pest-name').value = record.pestName;
             document.getElementById('scientific-name').value = record.scientificName || '';
