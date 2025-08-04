@@ -1,719 +1,933 @@
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#27ae60">
-  <title>زراعتي - تطبيق الزراعة الذكي</title>
-  <link rel="manifest" href="manifest.json">
-  <style>
-    :root {
-      --primary: #27ae60;
-      --light: #f4f8f7;
-      --dark: #2c3e50;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تسجيل الآفات والأمراض النباتية | Pest & Disease Recording System</title>
+    <!-- خط عربي داعم للـ PDF والعرض -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #27ae60;
+            --secondary-color: #2c3e50;
+            --danger-color: #e74c3c;
+            --light-color: #f5f5f5;
+            --dark-color: #333;
+            --white: #fff;
+            --border-radius: 8px;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', 'Tahoma', sans-serif;
-    }
+        body {
+            font-family: 'Cairo', 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.8;
+            transition: all 0.3s ease;
+        }
 
-    body {
-      background-color: var(--light);
-      color: var(--dark);
-      line-height: 1.6;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
 
-    .container {
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 15px;
-    }
+        header {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: 15px 0;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            margin-bottom: 20px;
+        }
 
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
-    header h1 {
-      color: var(--primary);
-      font-size: 1.8rem;
-    }
+        h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
 
-    .search-box {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      border: 1px solid #bdc3c7;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      outline: none;
-    }
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+        }
 
-    .btn {
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
+        .lang-btn {
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
 
-    .btn:hover {
-      background-color: #219653;
-    }
+        .lang-btn:hover {
+            background-color: #229b54;
+        }
 
-    .btn-danger {
-      background-color: #e74c3c;
-    }
+        .main-menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
 
-    .btn-danger:hover {
-      background-color: #c0392b;
-    }
+        .menu-btn {
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 14px;
-    }
+        .menu-btn:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
 
-    .add-btn {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
 
-    .crops-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
 
-    .crop-card {
-      background: white;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            font-family: 'Cairo', Arial, sans-serif;
+        }
 
-    .crop-card:hover {
-      transform: translateY(-5px);
-    }
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
 
-    .crop-img-container {
-      height: 150px;
-      overflow: hidden;
-    }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
 
-    .crop-img-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+        .form-row .form-group {
+            flex: 1;
+        }
 
-    .crop-info {
-      padding: 15px;
-    }
+        .camera-section {
+            margin: 25px 0;
+            text-align: center;
+        }
 
-    .crop-name {
-      font-weight: bold;
-      color: var(--primary);
-      margin-bottom: 5px;
-    }
+        #camera-preview {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            max-height: 300px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin: 10px auto;
+            display: block;
+        }
 
-    .crop-scientific {
-      font-size: 0.9rem;
-      color: #666;
-    }
+        #capture-btn {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
 
-    .crop-actions {
-      display: flex;
-      gap: 5px;
-      margin-top: 10px;
-    }
+        #capture-btn:hover {
+            background-color: #229b54;
+        }
 
-    /* نافذة التفاصيل */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      overflow-y: auto;
-      padding: 20px;
-    }
+        #captured-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
 
-    .modal-content {
-      background-color: white;
-      margin: 5% auto;
-      padding: 25px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 520px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
+        .image-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #eee;
-    }
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-    .modal-header h2 {
-      color: var(--primary);
-    }
+        .delete-image {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background-color: var(--danger-color);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
 
-    .close {
-      font-size: 28px;
-      font-weight: bold;
-      color: #aaa;
-      cursor: pointer;
-    }
+        #submit-btn {
+            padding: 14px 32px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: block;
+            margin: 25px auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            width: auto;
+        }
 
-    .close:hover {
-      color: #000;
-    }
+        #submit-btn:hover {
+            background-color: #229b54;
+        }
 
-    .form-group {
-      margin-bottom: 18px;
-    }
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+        .records-table th, .records-table td {
+            padding: 14px 12px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
 
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #bdc3c7;
-      border-radius: 8px;
-      font-size: 16px;
-      outline: none;
-    }
+        .records-table th {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            font-weight: 600;
+        }
 
-    .form-group textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
+        .records-table tr:hover {
+            background-color: #f8f9fa;
+        }
 
-    .preview-img {
-      max-width: 100%;
-      height: 120px;
-      object-fit: cover;
-      margin-top: 10px;
-      border-radius: 8px;
-      display: none;
-    }
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
 
-    /* تفاصيل المحصول */
-    .detail-content {
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-    }
+        .edit-btn {
+            background-color: #3498db;
+            color: var(--white);
+        }
 
-    .detail-img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
+        .delete-btn {
+            background-color: var(--danger-color);
+            color: var(--white);
+        }
 
-    .detail-row {
-      display: flex;
-      margin-bottom: 12px;
-    }
+        .pdf-btn {
+            background-color: #e74c3c;
+            color: var(--white);
+        }
 
-    .detail-label {
-      font-weight: bold;
-      color: var(--primary);
-      min-width: 130px;
-    }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
 
-    .detail-value {
-      flex: 1;
-    }
+        .page-btn {
+            padding: 10px 16px;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            min-width: 40px;
+        }
 
-    .detail-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+        .page-btn.active {
+            background-color: var(--primary-color);
+            transform: scale(1.05);
+        }
 
-    /* قالب PDF - يجب أن يكون مرئيًا تقنيًا */
-    #pdfContainer {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      width: 210mm;
-      min-height: 297mm;
-      background: white;
-      padding: 25px;
-      box-sizing: border-box;
-      direction: rtl;
-      font-family: 'Segoe UI', sans-serif;
-      z-index: -1;
-    }
-  </style>
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .no-records {
+            text-align: center;
+            padding: 30px 20px;
+            color: #777;
+            font-size: 1.1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .detail-label {
+            font-weight: 700;
+            width: 160px;
+            color: var(--secondary-color);
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex: 1;
+            word-wrap: break-word;
+        }
+
+        .detail-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .detail-image {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background-color: #7f8c8d;
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- تحسينات للهاتف المحمول --- */
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            .header-content {
+                text-align: center;
+            }
+            .menu-btn {
+                font-size: 1rem;
+                padding: 12px 16px;
+                min-width: 120px;
+            }
+            .records-table th, .records-table td {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+            .action-btn {
+                padding: 6px 8px;
+                font-size: 0.85rem;
+                gap: 4px;
+            }
+            .detail-row {
+                flex-direction: column;
+            }
+            .detail-label {
+                width: 100%;
+                margin-bottom: 4px;
+            }
+            .image-container, .detail-image {
+                width: 140px;
+                height: 140px;
+            }
+            #camera-preview {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .card {
+                padding: 16px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .menu-btn {
+                font-size: 0.95rem;
+                padding: 10px 14px;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            .search-input, .search-btn {
+                width: 100%;
+            }
+            .detail-image {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <div class="container">
-    <header>
-      <h1>زراعتي 🌿</h1>
-      <p>تطبيق إدارة المحاصيل الذكي</p>
-    </header>
-
-    <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن محصول..." />
-
-    <div class="add-btn">
-      <button id="addCropBtn" class="btn">➕ إضافة محصول</button>
-    </div>
-
-    <div id="cropsList" class="crops-grid"></div>
-  </div>
-
-  <!-- نافذة الإضافة/التعديل -->
-  <div id="cropModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">إضافة محصول جديد</h2>
-        <span class="close">&times;</span>
-      </div>
-      <form id="cropForm">
-        <div class="form-group">
-          <label>اختر صورة</label>
-          <input type="file" id="cropImage" accept="image/*" />
-          <img id="preview" class="preview-img" src="" alt="معاينة الصورة" />
-        </div>
-        <div class="form-group">
-          <label>الاسم المحلي *</label>
-          <input type="text" id="localName" required />
-        </div>
-        <div class="form-group">
-          <label>الاسم العلمي</label>
-          <input type="text" id="scientificName" />
-        </div>
-        <div class="form-group">
-          <label>فترة التزهير</label>
-          <input type="text" id="floweringPeriod" />
-        </div>
-        <div class="form-group">
-          <label>فترة الثمار</label>
-          <input type="text" id="fruitingPeriod" />
-        </div>
-        <div class="form-group">
-          <label>عائلة النبتة</label>
-          <input type="text" id="family" />
-        </div>
-        <div class="form-group">
-          <label>عمر النبتة</label>
-          <input type="text" id="lifespan" />
-        </div>
-        <div class="form-group">
-          <label>الموقع</label>
-          <input type="text" id="location" />
-        </div>
-        <div class="form-group">
-          <label>احتياج التسميد</label>
-          <textarea id="fertilizationNeeds" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn">💾 حفظ المحصول</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- نافذة التفاصيل -->
-  <div id="detailModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="detailTitle">تفاصيل المحصول</h2>
-        <span class="close-detail">&times;</span>
-      </div>
-      <div id="detailContent" class="detail-content"></div>
-      <div class="detail-actions">
-        <button id="editCropBtn" class="btn btn-sm">✏️ تعديل</button>
-        <button id="deleteCropBtn" class="btn btn-sm btn-danger">🗑️ حذف</button>
-        <button id="copyToClipboard" class="btn btn-sm">📋 نسخ</button>
-        <button id="downloadPdfBtn" class="btn">تنزيل كـ PDF</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- قالب PDF (يجب أن يكون مرئيًا تقنيًا) -->
-  <div id="pdfContainer"></div>
-
-  <!-- تحميل المكتبات -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <script>
-    // التحقق من دعم localStorage
-    if (typeof localStorage === 'undefined') {
-      alert('متصفحك لا يدعم التخزين المحلي.');
-    }
-
-    // تسجيل Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js').catch(() => {});
-      });
-    }
-
-    // المتغيرات
-    let crops = JSON.parse(localStorage.getItem('crops') || '[]');
-    let currentCropId = null;
-
-    const searchInput = document.getElementById('searchInput');
-    const cropsList = document.getElementById('cropsList');
-    const addCropBtn = document.getElementById('addCropBtn');
-    const cropModal = document.getElementById('cropModal');
-    const detailModal = document.getElementById('detailModal');
-    const cropForm = document.getElementById('cropForm');
-    const preview = document.getElementById('preview');
-    const cropImage = document.getElementById('cropImage');
-    const pdfContainer = document.getElementById('pdfContainer');
-
-    // عرض الصورة
-    cropImage.addEventListener('change', () => {
-      const file = cropImage.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-        };
-        reader.onerror = () => alert('فشل تحميل الصورة');
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // فتح/إغلاق النافذات
-    addCropBtn.onclick = () => openCropModal();
-    document.querySelector('.close')?.addEventListener('click', () => cropModal.style.display = 'none');
-    document.querySelector('.close-detail')?.addEventListener('click', () => detailModal.style.display = 'none');
-    window.onclick = (e) => {
-      if (e.target === cropModal) cropModal.style.display = 'none';
-      if (e.target === detailModal) detailModal.style.display = 'none';
-    };
-
-    // فتح نافذة الإضافة أو التعديل
-    function openCropModal(crop = null) {
-      cropForm.reset();
-      preview.style.display = 'none';
-      document.getElementById('modalTitle').textContent = crop ? 'تعديل المحصول' : 'إضافة محصول جديد';
-      currentCropId = crop ? crop.id : null;
-
-      if (crop) {
-        document.getElementById('localName').value = crop.localName;
-        document.getElementById('scientificName').value = crop.scientificName || '';
-        document.getElementById('floweringPeriod').value = crop.floweringPeriod || '';
-        document.getElementById('fruitingPeriod').value = crop.fruitingPeriod || '';
-        document.getElementById('family').value = crop.family || '';
-        document.getElementById('lifespan').value = crop.lifespan || '';
-        document.getElementById('location').value = crop.location || '';
-        document.getElementById('fertilizationNeeds').value = crop.fertilizationNeeds || '';
-        if (crop.image) {
-          preview.src = crop.image;
-          preview.style.display = 'block';
-        }
-      }
-      cropModal.style.display = 'block';
-    }
-
-    // ضغط الصورة
-    function compressImage(file, maxWidth = 800) {
-      return new Promise(resolve => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          let width = img.width;
-          let height = img.height;
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-          canvas.toBlob(blob => {
-            const compressed = new File([blob], file.name, { type: 'image/jpeg' });
-            resolve(compressed);
-          }, 'image/jpeg', 0.7);
-        };
-        img.src = URL.createObjectURL(file);
-      });
-    }
-
-    // تحويل الصورة إلى Base64
-    function toBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error('فشل قراءة الملف'));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // حفظ المحصول
-    cropForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const localName = document.getElementById('localName').value.trim();
-      if (!localName) {
-        alert('الاسم المحلي مطلوب');
-        return;
-      }
-
-      const file = cropImage.files[0];
-      let imageUrl = currentCropId ? crops.find(c => c.id === currentCropId)?.image : '';
-
-      if (file) {
-        try {
-          const compressedFile = await compressImage(file);
-          imageUrl = await toBase64(compressedFile);
-        } catch (error) {
-          alert('فشل تحميل الصورة. حاول صورة أصغر.');
-          return;
-        }
-      }
-
-      const cropData = {
-        id: currentCropId || Date.now().toString(),
-        image: imageUrl,
-        localName,
-        scientificName: document.getElementById('scientificName').value,
-        floweringPeriod: document.getElementById('floweringPeriod').value,
-        fruitingPeriod: document.getElementById('fruitingPeriod').value,
-        family: document.getElementById('family').value,
-        lifespan: document.getElementById('lifespan').value,
-        location: document.getElementById('location').value,
-        fertilizationNeeds: document.getElementById('fertilizationNeeds').value,
-      };
-
-      if (currentCropId) {
-        crops = crops.map(c => c.id === currentCropId ? cropData : c);
-      } else {
-        crops.push(cropData);
-      }
-
-      try {
-        localStorage.setItem('crops', JSON.stringify(crops));
-        cropModal.style.display = 'none';
-        renderCrops();
-        alert('تم الحفظ بنجاح!');
-      } catch (e) {
-        alert('فشل الحفظ. الجهاز ممتلئ أو المتصفح قديم.');
-      }
-    });
-
-    // حذف المحصول
-    function deleteCrop(id) {
-      if (confirm('هل أنت متأكد من الحذف؟')) {
-        crops = crops.filter(c => c.id !== id);
-        localStorage.setItem('crops', JSON.stringify(crops));
-        detailModal.style.display = 'none';
-        renderCrops();
-        alert('تم الحذف بنجاح!');
-      }
-    }
-
-    // عرض المحاصيل
-    function renderCrops() {
-      const term = searchInput.value.toLowerCase();
-      cropsList.innerHTML = '';
-      const filtered = crops.filter(crop =>
-        crop.localName.toLowerCase().includes(term) ||
-        (crop.scientificName && crop.scientificName.toLowerCase().includes(term))
-      );
-
-      if (filtered.length === 0) {
-        cropsList.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; color: #777; padding: 40px;">
-            <p>لا توجد محاصيل. أضف واحدًا!</p>
-          </div>`;
-        return;
-      }
-
-      filtered.forEach(crop => {
-        const div = document.createElement('div');
-        div.className = 'crop-card';
-        div.innerHTML = `
-          <div class="crop-img-container">
-            <img src="${crop.image || 'https://via.placeholder.com/300x150?text=لا+صورة'}" alt="${crop.localName}" />
-          </div>
-          <div class="crop-info">
-            <div class="crop-name">${crop.localName}</div>
-            <div class="crop-scientific">${crop.scientificName || 'لا يوجد اسم علمي'}</div>
-            <div class="crop-actions">
-              <button data-id="${crop.id}" class="edit-btn btn btn-sm">✏️</button>
-              <button data-id="${crop.id}" class="delete-btn btn btn-sm btn-danger">🗑️</button>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1 lang="ar">نظام تسجيل الآفات والأمراض النباتية</h1>
+                <h1 lang="en" class="hidden">Plant Pest & Disease Recording System</h1>
+                <div class="lang-switcher">
+                    <button class="lang-btn" onclick="switchLanguage('ar')">العربية</button>
+                    <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+                </div>
             </div>
-          </div>
-        `;
-        div.querySelector('.edit-btn').onclick = (e) => {
-          e.stopPropagation();
-          openCropModal(crops.find(c => c.id === e.target.dataset.id));
-        };
-        div.querySelector('.delete-btn').onclick = (e) => {
-          e.stopPropagation();
-          deleteCrop(e.target.dataset.id);
-        };
-        div.onclick = () => showCropDetail(crop);
-        cropsList.appendChild(div);
-      });
-    }
+        </header>
+        <div class="main-menu">
+            <button class="menu-btn" onclick="showSection('record-section')" id="record-btn">
+                <i class="fas fa-plus-circle"></i>
+                <span lang="ar">تسجيل إصابة جديدة</span>
+                <span lang="en" class="hidden">New Record</span>
+            </button>
+            <button class="menu-btn" onclick="showSection('records-section')" id="records-btn">
+                <i class="fas fa-list"></i>
+                <span lang="ar">قائمة الإصابات</span>
+                <span lang="en" class="hidden">Records List</span>
+            </button>
+        </div>
 
-    // عرض التفاصيل
-    function showCropDetail(crop) {
-      currentCropId = crop.id;
-      const detailContent = document.getElementById('detailContent');
-      detailContent.innerHTML = `
-        ${crop.image ? `<img src="${crop.image}" class="detail-img" alt="${crop.localName}" />` : ''}
-        <div class="detail-row">
-          <div class="detail-label">الاسم المحلي:</div>
-          <div class="detail-value">${crop.localName}</div>
+        <!-- تسجيل إصابة جديدة -->
+        <div class="card" id="record-section">
+            <h2 lang="ar">تسجيل إصابة جديدة</h2>
+            <h2 lang="en" class="hidden">New Pest/Disease Record</h2>
+            <form id="pestForm">
+                <div class="form-group">
+                    <label lang="ar">تاريخ الاكتشاف</label>
+                    <label lang="en" class="hidden">Discovery Date</label>
+                    <input type="date" id="discovery-date" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label lang="ar">اسم الإصابة المحتملة</label>
+                        <label lang="en" class="hidden">Potential Pest/Disease Name</label>
+                        <input type="text" id="pest-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label lang="ar">الاسم العلمي</label>
+                        <label lang="en" class="hidden">Scientific Name</label>
+                        <input type="text" id="scientific-name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label lang="ar">المحصول المصاب</label>
+                    <label lang="en" class="hidden">Affected Crop</label>
+                    <input type="text" id="affected-crop" required>
+                </div>
+                <div class="form-group">
+                    <label lang="ar">أعراض الإصابة</label>
+                    <label lang="en" class="hidden">Symptoms</label>
+                    <textarea id="symptoms" placeholder="صف الأعراض بدقة..." required></textarea>
+                </div>
+                <div class="camera-section">
+                    <h3 lang="ar">تصوير الإصابة</h3>
+                    <h3 lang="en" class="hidden">Capture Images</h3>
+                    <video id="camera-preview" autoplay playsinline></video>
+                    <button type="button" id="capture-btn" onclick="captureImage()">
+                        <i class="fas fa-camera"></i>
+                        <span lang="ar">التقاط صورة</span>
+                        <span lang="en" class="hidden">Capture Image</span>
+                    </button>
+                    <div id="captured-images"></div>
+                </div>
+                <div class="form-group">
+                    <label lang="ar">المكافحة الكيميائية (اسم المبيد)</label>
+                    <label lang="en" class="hidden">Chemical Control (Pesticide Name)</label>
+                    <input type="text" id="pesticide">
+                </div>
+                <div class="form-group">
+                    <label lang="ar">ملاحظات إضافية</label>
+                    <label lang="en" class="hidden">Additional Notes</label>
+                    <textarea id="notes" placeholder="ملاحظات إضافية..."></textarea>
+                </div>
+                <button type="submit" id="submit-btn">
+                    <i class="fas fa-save"></i>
+                    <span lang="ar">حفظ البيانات</span>
+                    <span lang="en" class="hidden">Save Record</span>
+                </button>
+            </form>
         </div>
-        <div class="detail-row">
-          <div class="detail-label">الاسم العلمي:</div>
-          <div class="detail-value">${crop.scientificName || 'غير محدد'}</div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-label">فترة التزهير:</div>
-          <div class="detail-value">${crop.floweringPeriod || 'غير محدد'}</div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-label">فترة الثمار:</div>
-          <div class="detail-value">${crop.fruitingPeriod || 'غير محدد'}</div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-label">عائلة النبتة:</div>
-          <div class="detail-value">${crop.family || 'غير محدد'}</div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-label">عمر النبتة:</div>
-          <div class="detail-value">${crop.lifespan || 'غير محدد'}</div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-label">الموقع:</div>
-          <div class="detail-value">${crop.location || 'غير محدد'}</div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-label">احتياج التسميد:</div>
-          <div class="detail-value">${crop.fertilizationNeeds || 'غير محدد'}</div>
-        </div>
-      `;
-      document.getElementById('detailTitle').textContent = crop.localName;
-      detailModal.style.display = 'block';
-    }
 
-    // نسخ التفاصيل
-    document.getElementById('copyToClipboard').addEventListener('click', () => {
-      const text = document.getElementById('detailContent').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('تم النسخ إلى الحافظة!');
-      }).catch(() => alert('فشل النسخ'));
-    });
-
-    // تعديل
-    document.getElementById('editCropBtn').addEventListener('click', () => {
-      const crop = crops.find(c => c.id === currentCropId);
-      openCropModal(crop);
-      detailModal.style.display = 'none';
-    });
-
-    // حذف
-    document.getElementById('deleteCropBtn').addEventListener('click', () => {
-      deleteCrop(currentCropId);
-    });
-
-    // تنزيل كـ PDF (الحل النهائي والاحترافي)
-    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-      const crop = crops.find(c => c.id === currentCropId);
-      if (!crop) return;
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      // إعداد القالب
-      pdfContainer.innerHTML = `
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #27ae60; font-size: 24px; margin: 0;">تقرير المحصول</h1>
-          <h2 style="font-size: 20px; margin: 10px 0;">${crop.localName}</h2>
+        <!-- قائمة الإصابات -->
+        <div class="card hidden" id="records-section">
+            <h2 lang="ar">قائمة الإصابات</h2>
+            <h2 lang="en" class="hidden">Records List</h2>
+            <div class="search-container">
+                <input type="text" class="search-input" id="search-input" placeholder="ابحث في السجلات..." lang="ar">
+                <input type="text" class="search-input hidden" id="search-input-en" placeholder="Search records..." lang="en">
+                <button class="search-btn" onclick="searchRecords()">
+                    <i class="fas fa-search"></i>
+                    <span lang="ar">بحث</span>
+                    <span lang="en" class="hidden">Search</span>
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="records-table">
+                    <thead>
+                        <tr>
+                            <th lang="ar">التاريخ</th>
+                            <th lang="en" class="hidden">Date</th>
+                            <th lang="ar">اسم الإصابة</th>
+                            <th lang="en" class="hidden">Pest/Disease</th>
+                            <th lang="ar">المحصول</th>
+                            <th lang="en" class="hidden">Crop</th>
+                            <th lang="ar">الإجراءات</th>
+                            <th lang="en" class="hidden">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-table-body"></tbody>
+                </table>
+            </div>
+            <div class="no-records hidden" id="no-records">
+                <p lang="ar">لا توجد سجلات مسجلة</p>
+                <p lang="en" class="hidden">No records found</p>
+            </div>
+            <div class="pagination" id="pagination"></div>
         </div>
-        ${crop.image ? `<img src="${crop.image}" style="width: 100%; max-width: 180px; height: auto; display: block; margin: 20px auto; border: 1px solid #ddd; border-radius: 8px;" />` : ''}
-        <div style="margin: 20px 0; line-height: 2; font-size: 14px;">
-          <p><strong>الاسم المحلي:</strong> ${crop.localName}</p>
-          <p><strong>الاسم العلمي:</strong> ${crop.scientificName || 'غير محدد'}</p>
-          <p><strong>فترة التزهير:</strong> ${crop.floweringPeriod || 'غير محدد'}</p>
-          <p><strong>فترة الثمار:</strong> ${crop.fruitingPeriod || 'غير محدد'}</p>
-          <p><strong>عائلة النبتة:</strong> ${crop.family || 'غير محدد'}</p>
-          <p><strong>عمر النبتة:</strong> ${crop.lifespan || 'غير محدد'}</p>
-          <p><strong>الموقع:</strong> ${crop.location || 'غير محدد'}</p>
-          <p><strong>احتياج التسميد:</strong> ${crop.fertilizationNeeds || 'غير محدد'}</p>
-        </div>
-        <div style="text-align: center; margin-top: 40px; color: #666; font-size: 12px; border-top: 1px solid #eee; padding-top: 15px;">
-          تم إنشاء هذا التقرير باستخدام تطبيق زراعتي الذكي
-        </div>
-      `;
 
-      try {
-        // الانتظار حتى تحميل الصورة
-        const img = pdfContainer.querySelector('img');
-        if (img) {
-          await new Promise((resolve) => {
-            if (img.complete) resolve();
-            else img.onload = resolve;
-          });
-        }
+        <!-- تفاصيل الإصابة -->
+        <div class="card hidden" id="record-details-section">
+            <button class="back-btn" onclick="showSection('records-section')">
+                <i class="fas fa-arrow-left"></i>
+                <span lang="ar">العودة للقائمة</span>
+                <span lang="en" class="hidden">Back to List</span>
+            </button>
+            <h2 lang="ar">تفاصيل الإصابة</h2>
+            <h2 lang="en" class="hidden">Record Details</h2>
+            <div class="record-details" id="record-details"></div>
+        </div>
+    </div>
 
-        // التقاط الشاشة
-        const canvas = await html2canvas(pdfContainer, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: 'white',
-          logging: false
+    <script>
+        let currentLanguage = 'ar';
+        let records = JSON.parse(localStorage.getItem('pestRecords')) || [];
+        let currentPage = 1;
+        const recordsPerPage = 5;
+        let stream = null;
+        let currentRecordId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('discovery-date').value = today;
+
+            initCamera();
+            showSection('record-section');
+            if (records.length > 0) {
+                renderRecordsTable();
+            } else {
+                document.getElementById('no-records').classList.remove('hidden');
+            }
+            window.jsPDF = window.jspdf.jsPDF;
         });
 
-        const imgData = canvas.toDataURL('image/jpeg', 0.9);
-        const width = pdf.internal.pageSize.getWidth();
-        const height = (canvas.height * width) / canvas.width;
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('[lang]').forEach(el => {
+                if (el.tagName !== 'HTML') el.classList.add('hidden');
+            });
+            document.querySelectorAll(`[lang="${lang}"]`).forEach(el => {
+                el.classList.remove('hidden');
+            });
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.body.style.fontFamily = lang === 'ar' ? "'Cairo', Arial, sans-serif" : "Arial, sans-serif";
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, width, height);
-        pdf.save(`${crop.localName}.pdf`);
+            if (!document.getElementById('records-section').classList.contains('hidden')) {
+                renderRecordsTable();
+            }
+        }
 
-        // تنظيف القالب بعد الإنشاء
-        pdfContainer.innerHTML = '';
+        function showSection(sectionId) {
+            document.querySelectorAll('.card').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+            if (sectionId === 'records-section') renderRecordsTable();
+        }
 
-      } catch (error) {
-        console.error('خطأ في إنشاء PDF:', error);
-        alert('فشل إنشاء PDF. تأكد من اتصال الإنترنت وحاول مرة أخرى.');
-      }
-    });
+        async function initCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                document.getElementById('camera-preview').srcObject = stream;
+            } catch (err) {
+                console.error("Camera access error:", err);
+                alert(currentLanguage === 'ar' ? "الكاميرا غير متاحة. تأكد من الأذونات." : "Camera not available. Please check permissions.");
+            }
+        }
 
-    // بحث
-    searchInput.addEventListener('input', renderCrops);
+        function captureImage() {
+            const video = document.getElementById('camera-preview');
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imgData = canvas.toDataURL('image/jpeg', 0.9); // جودة عالية
+            addCapturedImage(imgData);
+        }
 
-    // تحميل المحاصيل
-    renderCrops();
-  </script>
+        function addCapturedImage(imgData) {
+            const container = document.createElement('div');
+            container.className = 'image-container';
+            const img = document.createElement('img');
+            img.src = imgData;
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-image';
+            deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+            deleteBtn.onclick = () => container.remove();
+            container.appendChild(img);
+            container.appendChild(deleteBtn);
+            document.getElementById('captured-images').appendChild(container);
+        }
+
+        document.getElementById('pestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                id: Date.now().toString(),
+                date: document.getElementById('discovery-date').value,
+                pestName: document.getElementById('pest-name').value,
+                scientificName: document.getElementById('scientific-name').value,
+                affectedCrop: document.getElementById('affected-crop').value,
+                symptoms: document.getElementById('symptoms').value,
+                pesticide: document.getElementById('pesticide').value,
+                notes: document.getElementById('notes').value,
+                images: Array.from(document.querySelectorAll('#captured-images .image-container img')).map(img => img.src),
+                createdAt: new Date().toISOString()
+            };
+
+            records.unshift(formData);
+            localStorage.setItem('pestRecords', JSON.stringify(records));
+            alert(currentLanguage === 'ar' ? 'تم حفظ السجل بنجاح!' : 'Record saved successfully!');
+            this.reset();
+            document.getElementById('captured-images').innerHTML = '';
+            document.getElementById('discovery-date').value = new Date().toISOString().split('T')[0];
+            showSection('records-section');
+        });
+
+        function renderRecordsTable(page = 1) {
+            currentPage = page;
+            const startIndex = (page - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            const paginatedRecords = records.slice(startIndex, endIndex);
+            const tableBody = document.getElementById('records-table-body');
+            tableBody.innerHTML = '';
+
+            if (paginatedRecords.length === 0) {
+                document.getElementById('no-records').classList.remove('hidden');
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            } else {
+                document.getElementById('no-records').classList.add('hidden');
+            }
+
+            paginatedRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.pestName}</td>
+                    <td>${record.affectedCrop}</td>
+                    <td>
+                        <button class="action-btn" onclick="viewRecordDetails('${record.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn edit-btn" onclick="editRecord('${record.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete-btn" onclick="deleteRecord('${record.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn pdf-btn" onclick="generatePDF('${record.id}')"><i class="fas fa-file-pdf"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(records.length / recordsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            paginationDiv.innerHTML = '';
+            if (totalPages <= 1) return;
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                btn.textContent = i;
+                btn.onclick = () => renderRecordsTable(i);
+                paginationDiv.appendChild(btn);
+            }
+        }
+
+        function viewRecordDetails(recordId) {
+            const record = records.find(r => r.id === recordId);
+            if (!record) return;
+            const detailsDiv = document.getElementById('record-details');
+            detailsDiv.innerHTML = `
+                <div class="detail-row"><div class="detail-label" lang="ar">تاريخ الاكتشاف:</div><div class="detail-value">${record.date}</div></div>
+                <div class="detail-row"><div class="detail-label" lang="ar">اسم الإصابة:</div><div class="detail-value">${record.pestName}</div></div>
+                <div class="detail-row"><div class="detail-label" lang="ar">الاسم العلمي:</div><div class="detail-value">${record.scientificName || '—'}</div></div>
+                <div class="detail-row"><div class="detail-label" lang="ar">المحصول:</div><div class="detail-value">${record.affectedCrop}</div></div>
+                <div class="detail-row"><div class="detail-label" lang="ar">الأعراض:</div><div class="detail-value">${record.symptoms}</div></div>
+                <div class="detail-row"><div class="detail-label" lang="ar">المبيد:</div><div class="detail-value">${record.pesticide || '—'}</div></div>
+                <div class="detail-row"><div class="detail-label" lang="ar">ملاحظات:</div><div class="detail-value">${record.notes || '—'}</div></div>
+                <h3 lang="ar">صور الإصابة:</h3>
+                <div class="detail-images">${record.images?.length ? record.images.map(src => `<img src="${src}" class="detail-image">`).join('') : (currentLanguage === 'ar' ? 'لا توجد صور' : 'No images')}</div>
+            `;
+            switchLanguage(currentLanguage); // تأكد من تحديث اللغة
+            showSection('record-details-section');
+        }
+
+        function generatePDF(recordId) {
+            const record = records.find(r => r.id === recordId);
+            if (!record) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // تضمين الخط العربي (مهم للعرض الصحيح)
+            doc.setFont('Cairo');
+
+            // العنوان
+            doc.setFontSize(20);
+            doc.setTextColor(40, 40, 40);
+            doc.text(currentLanguage === 'ar' ? 'تقرير الإصابة النباتية' : 'Plant Pest/Disease Report', 105, 20, { align: 'center' });
+
+            // البيانات
+            doc.setFontSize(14);
+            let y = 40;
+            const leftMargin = 20;
+            const maxWidth = 170;
+
+            doc.text(`${currentLanguage === 'ar' ? 'تاريخ الاكتشاف:' : 'Discovery Date:'} ${record.date}`, leftMargin, y); y += 15;
+            doc.text(`${currentLanguage === 'ar' ? 'اسم الإصابة:' : 'Pest/Disease Name:'} ${record.pestName}`, leftMargin, y); y += 15;
+            if (record.scientificName) {
+                doc.text(`${currentLanguage === 'ar' ? 'الاسم العلمي:' : 'Scientific Name:'} ${record.scientificName}`, leftMargin, y); y += 15;
+            }
+            doc.text(`${currentLanguage === 'ar' ? 'المحصول:' : 'Crop:'} ${record.affectedCrop}`, leftMargin, y); y += 15;
+
+            // الأعراض
+            doc.text(`${currentLanguage === 'ar' ? 'أعراض الإصابة:' : 'Symptoms:'}`, leftMargin, y);
+            y += 8;
+            const symptomsLines = doc.splitTextToSize(record.symptoms, maxWidth);
+            doc.text(symptomsLines, leftMargin, y);
+            y += symptomsLines.length * 6 + 10;
+
+            if (record.pesticide) {
+                doc.text(`${currentLanguage === 'ar' ? 'المبيد المستخدم:' : 'Pesticide Used:'} ${record.pesticide}`, leftMargin, y); y += 15;
+            }
+            if (record.notes) {
+                doc.text(`${currentLanguage === 'ar' ? 'ملاحظات:' : 'Notes:'}`, leftMargin, y); y += 8;
+                const notesLines = doc.splitTextToSize(record.notes, maxWidth);
+                doc.text(notesLines, leftMargin, y); y += notesLines.length * 6 + 10;
+            }
+
+            // الصور
+            if (record.images && record.images.length > 0) {
+                doc.addPage();
+                doc.text(`${currentLanguage === 'ar' ? 'صور الإصابة' : 'Pest Images'}`, leftMargin, 20);
+                y = 30;
+
+                record.images.forEach((img, index) => {
+                    if (index > 0 && index % 2 === 0) {
+                        doc.addPage();
+                        y = 30;
+                    }
+                    if (index % 2 === 1) y = 120;
+
+                    doc.addImage(img, 'JPEG', 20, y, 80, 80);
+                    if (index % 2 === 0 && index < record.images.length - 1) {
+                        // صورة ثانية في نفس الصفحة
+                        doc.addImage(record.images[index + 1], 'JPEG', 110, y, 80, 80);
+                    }
+                    y += 90;
+                });
+            }
+
+            doc.save(`${record.pestName}_${record.date}.pdf`);
+        }
+
+        function editRecord(recordId) {
+            const record = records.find(r => r.id === recordId);
+            if (!record) return;
+            Object.assign(document, {
+                'discovery-date': record.date,
+                'pest-name': record.pestName,
+                'scientific-name': record.scientificName || '',
+                'affected-crop': record.affectedCrop,
+                'symptoms': record.symptoms,
+                'pesticide': record.pesticide || '',
+                'notes': record.notes || ''
+            });
+            document.getElementById('discovery-date').value = record.date;
+            document.getElementById('pest-name').value = record.pestName;
+            document.getElementById('scientific-name').value = record.scientificName || '';
+            document.getElementById('affected-crop').value = record.affectedCrop;
+            document.getElementById('symptoms').value = record.symptoms;
+            document.getElementById('pesticide').value = record.pesticide || '';
+            document.getElementById('notes').value = record.notes || '';
+
+            const imagesContainer = document.getElementById('captured-images');
+            imagesContainer.innerHTML = '';
+            (record.images || []).forEach(imgData => addCapturedImage(imgData));
+
+            records = records.filter(r => r.id !== recordId);
+            localStorage.setItem('pestRecords', JSON.stringify(records));
+            showSection('record-section');
+        }
+
+        function deleteRecord(recordId) {
+            if (confirm(currentLanguage === 'ar' ? 'هل أنت متأكد من الحذف؟' : 'Are you sure you want to delete this record?')) {
+                records = records.filter(r => r.id !== recordId);
+                localStorage.setItem('pestRecords', JSON.stringify(records));
+                renderRecordsTable();
+                if (records.length === 0) document.getElementById('no-records').classList.remove('hidden');
+            }
+        }
+
+        function searchRecords() {
+            const input = currentLanguage === 'ar' ? document.getElementById('search-input') : document.getElementById('search-input-en');
+            const term = input.value.toLowerCase().trim();
+            if (!term) return renderRecordsTable();
+
+            const filtered = records.filter(r =>
+                r.pestName.toLowerCase().includes(term) ||
+                (r.scientificName && r.scientificName.toLowerCase().includes(term)) ||
+                r.affectedCrop.toLowerCase().includes(term) ||
+                r.symptoms.toLowerCase().includes(term) ||
+                (r.pesticide && r.pesticide.toLowerCase().includes(term)) ||
+                (r.notes && r.notes.toLowerCase().includes(term))
+            );
+            renderSearchResults(filtered);
+        }
+
+        function renderSearchResults(results) {
+            const tbody = document.getElementById('records-table-body');
+            tbody.innerHTML = results.length ? results.map(r => `
+                <tr>
+                    <td>${r.date}</td>
+                    <td>${r.pestName}</td>
+                    <td>${r.affectedCrop}</td>
+                    <td>
+                        <button class="action-btn" onclick="viewRecordDetails('${r.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn edit-btn" onclick="editRecord('${r.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete-btn" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn pdf-btn" onclick="generatePDF('${r.id}')"><i class="fas fa-file-pdf"></i></button>
+                    </td>
+                </tr>
+            `).join('') : '';
+            document.getElementById('no-records').classList.toggle('hidden', results.length > 0);
+            document.getElementById('pagination').innerHTML = '';
+        }
+    </script>
 </body>
 </html>
