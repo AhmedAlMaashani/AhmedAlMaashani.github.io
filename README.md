@@ -637,17 +637,10 @@
                     <textarea id="symptoms" placeholder="صف الأعراض بدقة: لون الأوراق، وجود بقع، تجعد، يبس ..." required></textarea>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label lang="ar">الشخص المسؤول</label>
-                        <label lang="en" class="hidden">Recorded By</label>
-                        <input type="text" id="recorded-by" placeholder="اسم الشخص الذي سجل البيانات" required>
-                    </div>
-                    <div class="form-group">
-                        <label lang="ar">رقم الهاتف</label>
-                        <label lang="en" class="hidden">Phone Number</label>
-                        <input type="tel" id="phone" placeholder="رقم الهاتف للتواصل">
-                    </div>
+                <div class="form-group">
+                    <label lang="ar">اسم مدخل البيانات</label>
+                    <label lang="en" class="hidden">Recorded By</label>
+                    <input type="text" id="recorded-by" placeholder="اسم الشخص الذي سجل البيانات" required>
                 </div>
 
                 <div class="camera-section">
@@ -850,7 +843,6 @@
                 pesticide: form['pesticide'].value,
                 notes: form['notes'].value,
                 recordedBy: form['recorded-by'].value,
-                phone: form['phone'].value,
                 images: Array.from(document.querySelectorAll('#captured-images img')).map(img => img.src),
                 createdAt: new Date().toISOString()
             };
@@ -916,8 +908,7 @@
             if (!r) return;
             document.getElementById('record-details').innerHTML = `
                 <div class="detail-row"><div class="detail-label" lang="ar">التاريخ:</div><div class="detail-value">${r.date}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">الشخص المسؤول:</div><div class="detail-value">${r.recordedBy}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">رقم الهاتف:</div><div class="detail-value">${r.phone || '—'}</div></div>
+                <div class="detail-row"><div class="detail-label" lang="ar">اسم مدخل البيانات:</div><div class="detail-value">${r.recordedBy}</div></div>
                 <div class="detail-row"><div class="detail-label" lang="ar">الإصابة:</div><div class="detail-value">${r.pestName}</div></div>
                 <div class="detail-row"><div class="detail-label" lang="ar">الاسم العلمي:</div><div class="detail-value">${r.scientificName || '—'}</div></div>
                 <div class="detail-row"><div class="detail-label" lang="ar">المحصول:</div><div class="detail-value">${r.affectedCrop}</div></div>
@@ -958,8 +949,7 @@
                     <h3 style="color: #2c3e50; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">معلومات السجل</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                         <div><strong style="color: #2c3e50;">تاريخ الاكتشاف:</strong> ${r.date}</div>
-                        <div><strong style="color: #2c3e50;">الشخص المسؤول:</strong> ${r.recordedBy}</div>
-                        <div><strong style="color: #2c3e50;">رقم الهاتف:</strong> ${r.phone || '—'}</div>
+                        <div><strong style="color: #2c3e50;">اسم مدخل البيانات:</strong> ${r.recordedBy}</div>
                         <div><strong style="color: #2c3e50;">اسم الإصابة:</strong> ${r.pestName}</div>
                         <div><strong style="color: #2c3e50;">الاسم العلمي:</strong> ${r.scientificName || '-'}</div>
                         <div><strong style="color: #2c3e50;">المحصول المصاب:</strong> ${r.affectedCrop}</div>
@@ -1032,7 +1022,6 @@
             document.getElementById('pesticide').value = r.pesticide || '';
             document.getElementById('notes').value = r.notes || '';
             document.getElementById('recorded-by').value = r.recordedBy;
-            document.getElementById('phone').value = r.phone || '';
 
             const container = document.getElementById('captured-images');
             container.innerHTML = '';
