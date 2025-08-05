@@ -20,13 +20,11 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --btn-size: 56px;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         body {
             font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
             background-color: var(--light);
@@ -36,14 +34,12 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 15px;
             min-height: 100vh;
         }
-
         header {
             background: linear-gradient(135deg, var(--secondary), #1a2530);
             color: var(--white);
@@ -52,54 +48,23 @@
             margin-bottom: 25px;
             box-shadow: var(--shadow);
         }
-
         .header-content {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 0 20px;
-            flex-wrap: wrap;
-            gap: 15px;
         }
-
         h1 {
             font-size: 1.6rem;
             font-weight: 700;
             text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
         }
-
-        .lang-switcher {
-            display: flex;
-            gap: 12px;
-        }
-
-        .lang-btn {
-            padding: 12px 20px;
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.05rem;
-            transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
-            min-width: 90px;
-            text-align: center;
-        }
-
-        .lang-btn:hover {
-            background-color: #229b54;
-            transform: translateY(-2px);
-        }
-
         .main-menu {
             display: flex;
             gap: 20px;
             margin-bottom: 30px;
             flex-wrap: wrap;
         }
-
         .menu-btn {
             padding: 18px 25px;
             background-color: var(--secondary);
@@ -119,17 +84,14 @@
             box-shadow: var(--shadow);
             height: var(--btn-size);
         }
-
         .menu-btn:hover {
             background-color: var(--primary);
             transform: translateY(-4px);
             box-shadow: 0 8px 30px rgba(39, 174, 96, 0.4);
         }
-
         .menu-btn i {
             font-size: 1.4rem;
         }
-
         .card {
             background-color: var(--white);
             border-radius: var(--border-radius);
@@ -138,12 +100,10 @@
             margin-bottom: 30px;
             transition: var(--transition);
         }
-
         .card:hover {
             transform: translateY(-6px);
             box-shadow: 0 12px 40px rgba(0,0,0,0.18);
         }
-
         h2 {
             margin-bottom: 25px;
             color: var(--secondary);
@@ -153,7 +113,6 @@
             padding-bottom: 15px;
             border-bottom: 2px solid var(--primary);
         }
-
         label {
             display: block;
             margin-bottom: 12px;
@@ -161,7 +120,6 @@
             color: var(--secondary);
             font-size: 1.1rem;
         }
-
         input[type="text"],
         input[type="date"],
         textarea,
@@ -176,7 +134,6 @@
             font-family: 'Cairo', sans-serif;
             min-height: 56px;
         }
-
         input[type="text"]:focus,
         input[type="date"]:focus,
         textarea:focus {
@@ -185,28 +142,23 @@
             box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15);
             transform: scale(1.02);
         }
-
         textarea {
             min-height: 160px;
             resize: vertical;
             line-height: 1.7;
         }
-
         .form-row {
             display: flex;
             gap: 25px;
             margin-bottom: 25px;
         }
-
         .form-row .form-group {
             flex: 1;
         }
-
         .camera-section {
             margin: 35px 0;
             text-align: center;
         }
-
         #camera-preview {
             width: 100%;
             max-width: 500px;
@@ -220,7 +172,6 @@
             object-fit: cover;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
         .image-actions {
             display: flex;
             justify-content: center;
@@ -228,7 +179,6 @@
             flex-wrap: wrap;
             margin: 20px 0;
         }
-
         #capture-btn,
         .upload-btn {
             padding: 16px 28px;
@@ -245,26 +195,21 @@
             min-height: 60px;
             min-width: 180px;
         }
-
         #capture-btn {
             background-color: var(--primary);
             color: var(--white);
         }
-
         .upload-btn {
             background-color: #3498db;
             color: var(--white);
         }
-
         #capture-btn:hover,
         .upload-btn:hover {
             transform: translateY(-3px);
         }
-
         #file-upload {
             display: none;
         }
-
         #captured-images {
             display: flex;
             flex-wrap: wrap;
@@ -273,7 +218,6 @@
             justify-content: center;
             min-height: 80px;
         }
-
         .image-container {
             position: relative;
             width: 150px;
@@ -284,23 +228,19 @@
             border: 3px solid var(--primary);
             transition: var(--transition);
         }
-
         .image-container:hover {
             transform: scale(1.08);
             box-shadow: 0 8px 30px rgba(0,0,0,0.2);
         }
-
         .image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: var(--transition);
         }
-
         .image-container img:hover {
             transform: scale(1.1);
         }
-
         .delete-image {
             position: absolute;
             top: 10px;
@@ -320,16 +260,13 @@
             opacity: 0;
             transition: var(--transition);
         }
-
         .image-container:hover .delete-image {
             opacity: 1;
         }
-
         .delete-image:hover {
             background-color: #c0392b;
             transform: scale(1.15);
         }
-
         #submit-btn {
             padding: 18px 50px;
             background: linear-gradient(135deg, var(--primary), #219653);
@@ -346,12 +283,10 @@
             min-width: 250px;
             min-height: 70px;
         }
-
         #submit-btn:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 35px rgba(39, 174, 96, 0.6);
         }
-
         /* --- جدول السجلات --- */
         .records-table {
             width: 100%;
@@ -362,7 +297,6 @@
             border-radius: 12px;
             overflow: hidden;
         }
-
         .records-table th {
             background-color: var(--secondary);
             color: var(--white);
@@ -371,19 +305,16 @@
             font-weight: 600;
             font-size: 1.15rem;
         }
-
         .records-table td {
             padding: 18px 15px;
             border-bottom: 1px solid #eee;
             text-align: right;
             font-size: 1.05rem;
         }
-
         .records-table tr:hover {
             background-color: #f8f9fa;
             transition: var(--transition);
         }
-
         .action-btn {
             padding: 14px 18px;
             border: none;
@@ -399,26 +330,21 @@
             min-height: 50px;
             min-width: 50px;
         }
-
         .edit-btn {
             background-color: #3498db;
             color: var(--white);
         }
-
         .delete-btn {
             background-color: var(--danger);
             color: var(--white);
         }
-
         .pdf-btn {
             background-color: #8e44ad;
             color: var(--white);
         }
-
         .action-btn:hover {
             transform: scale(1.1);
         }
-
         .pagination {
             display: flex;
             justify-content: center;
@@ -426,7 +352,6 @@
             gap: 12px;
             flex-wrap: wrap;
         }
-
         .page-btn {
             padding: 14px 20px;
             background-color: var(--secondary);
@@ -439,19 +364,16 @@
             transition: var(--transition);
             min-height: 56px;
         }
-
         .page-btn.active {
             background-color: var(--primary);
             transform: scale(1.12);
         }
-
         .search-container {
             margin-bottom: 30px;
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-
         .search-input {
             flex: 1;
             min-width: 250px;
@@ -462,7 +384,6 @@
             transition: var(--transition);
             min-height: 60px;
         }
-
         .search-btn {
             padding: 16px 28px;
             background-color: var(--secondary);
@@ -475,7 +396,6 @@
             min-height: 60px;
             min-width: 120px;
         }
-
         .no-records {
             text-align: center;
             padding: 60px 30px;
@@ -486,14 +406,12 @@
             margin: 25px 0;
             border: 2px dashed #dee2e6;
         }
-
         .detail-row {
             display: flex;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px dashed #eee;
         }
-
         .detail-label {
             font-weight: 700;
             width: 200px;
@@ -501,14 +419,12 @@
             flex-shrink: 0;
             font-size: 1.1rem;
         }
-
         .detail-value {
             flex: 1;
             word-wrap: break-word;
             color: #2c3e50;
             font-size: 1.1rem;
         }
-
         .detail-images {
             display: flex;
             flex-wrap: wrap;
@@ -516,7 +432,6 @@
             margin-top: 30px;
             justify-content: center;
         }
-
         .detail-image {
             width: 250px;
             height: 250px;
@@ -526,12 +441,10 @@
             border: 3px solid var(--primary);
             transition: var(--transition);
         }
-
         .detail-image:hover {
             transform: scale(1.08);
             box-shadow: 0 12px 40px rgba(0,0,0,0.25);
         }
-
         .back-btn {
             padding: 14px 28px;
             background-color: #7f8c8d;
@@ -548,17 +461,13 @@
             min-height: 56px;
             min-width: 160px;
         }
-
         .back-btn:hover {
             background-color: #95a5a6;
             transform: translateY(-3px);
         }
-
         .hidden {
             display: none !important;
         }
-
-        /* --- تصميم خاص للجوال --- */
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -610,7 +519,6 @@
                 padding: 16px 40px;
             }
         }
-
         @media (max-width: 480px) {
             .container {
                 padding: 12px;
@@ -627,10 +535,6 @@
             .menu-btn {
                 font-size: 1rem;
                 padding: 14px 18px;
-            }
-            .lang-btn {
-                font-size: 0.95rem;
-                padding: 10px 16px;
             }
             .search-container {
                 flex-direction: column;
@@ -654,156 +558,121 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <h1 lang="ar">نظام تسجيل الآفات والأمراض النباتية</h1>
-                <h1 lang="en" class="hidden">Plant Pest & Disease Recording System</h1>
-                <div class="lang-switcher">
-                    <button class="lang-btn" onclick="switchLanguage('ar')">العربية</button>
-                    <button class="lang-btn" onclick="switchLanguage('en')">English</button>
-                </div>
+                <h1>نظام تسجيل الآفات والأمراض النباتية</h1>
             </div>
         </header>
-
         <div class="main-menu">
             <button class="menu-btn" onclick="showSection('record-section')">
                 <i class="fas fa-plus-circle"></i>
-                <span lang="ar">تسجيل إصابة جديدة</span>
-                <span lang="en" class="hidden">New Record</span>
+                تسجيل إصابة جديدة
             </button>
             <button class="menu-btn" onclick="showSection('records-section')">
                 <i class="fas fa-list"></i>
-                <span lang="ar">قائمة الإصابات</span>
-                <span lang="en" class="hidden">Records List</span>
+                قائمة الإصابات
             </button>
         </div>
-
         <!-- تسجيل إصابة جديدة -->
         <div class="card" id="record-section">
-            <h2 lang="ar">تسجيل إصابة جديدة</h2>
-            <h2 lang="en" class="hidden">New Pest/Disease Record</h2>
+            <h2>تسجيل إصابة جديدة</h2>
             <form id="pestForm">
                 <div class="form-group">
-                    <label lang="ar">تاريخ الاكتشاف</label>
-                    <label lang="en" class="hidden">Discovery Date</label>
+                    <label>تاريخ الاكتشاف</label>
                     <input type="date" id="discovery-date" required>
+                </div>
+                <div class="form-group">
+                    <label>اسم مدخل البيانات</label>
+                    <input type="text" id="recorded-by" placeholder="اسم الشخص الذي سجل البيانات" required>
+                </div>
+                <div class="form-group">
+                    <label>الموقع</label>
+                    <input type="text" id="location" placeholder="اسم الحقلة، المنطقة، المحافظة ..." required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label lang="ar">اسم الإصابة المحتملة</label>
-                        <label lang="en" class="hidden">Potential Pest/Disease Name</label>
+                        <label>اسم الإصابة المحتملة</label>
                         <input type="text" id="pest-name" placeholder="مثل: منجاة، بق، فطر ..." required>
                     </div>
                     <div class="form-group">
-                        <label lang="ar">الاسم العلمي</label>
-                        <label lang="en" class="hidden">Scientific Name</label>
+                        <label>الاسم العلمي</label>
                         <input type="text" id="scientific-name" placeholder="مثل: Tetranychus urticae">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label lang="ar">المحصول المصاب</label>
-                    <label lang="en" class="hidden">Affected Crop</label>
+                    <label>المحصول المصاب</label>
                     <input type="text" id="affected-crop" placeholder="مثل: طماطم، قمح، برتقال ..." required>
                 </div>
                 <div class="form-group">
-                    <label lang="ar">أعراض الإصابة</label>
-                    <label lang="en" class="hidden">Symptoms</label>
+                    <label>أعراض الإصابة</label>
                     <textarea id="symptoms" placeholder="صف الأعراض بدقة: لون الأوراق، وجود بقع، تجعد، يبس ..." required></textarea>
                 </div>
-
-                <div class="form-group">
-                    <label lang="ar">اسم مدخل البيانات</label>
-                    <label lang="en" class="hidden">Recorded By</label>
-                    <input type="text" id="recorded-by" placeholder="اسم الشخص الذي سجل البيانات" required>
-                </div>
-
                 <div class="camera-section">
-                    <h3 lang="ar">إضافة صور للإصابة</h3>
-                    <h3 lang="en" class="hidden">Add Images of the Pest</h3>
+                    <h3>إضافة صور للإصابة</h3>
                     <video id="camera-preview" autoplay playsinline muted></video>
                     <div class="image-actions">
                         <button type="button" id="capture-btn" onclick="captureImage()">
                             <i class="fas fa-camera"></i>
-                            <span lang="ar">التقاط صورة</span>
-                            <span lang="en" class="hidden">Capture</span>
+                            التقاط صورة
                         </button>
                         <label for="file-upload" class="upload-btn">
                             <i class="fas fa-upload"></i>
-                            <span lang="ar">اختر من الجهاز</span>
-                            <span lang="en" class="hidden">Upload</span>
+                            اختر من الجهاز
                         </label>
                         <input type="file" id="file-upload" accept="image/*" multiple onchange="handleFileSelect(event)">
                     </div>
                     <div id="captured-images"></div>
                 </div>
-
                 <div class="form-group">
-                    <label lang="ar">اسم المبيد (إن وُجد)</label>
-                    <label lang="en" class="hidden">Pesticide Name (if any)</label>
+                    <label>اسم المبيد (إن وُجد)</label>
                     <input type="text" id="pesticide" placeholder="مثل: أكترا، كارازين ...">
                 </div>
                 <div class="form-group">
-                    <label lang="ar">ملاحظات إضافية</label>
-                    <label lang="en" class="hidden">Additional Notes</label>
-                    <textarea id="notes" placeholder="ملاحظات حول الموقع، الكثافة، الطقس ..."></textarea>
+                    <label>ملاحظات إضافية</label>
+                    <textarea id="notes" placeholder="ملاحظات حول الكثافة، الطقس ..."></textarea>
                 </div>
                 <button type="submit" id="submit-btn">
                     <i class="fas fa-save"></i>
-                    <span lang="ar">حفظ البيانات</span>
-                    <span lang="en" class="hidden">Save Record</span>
+                    حفظ البيانات
                 </button>
             </form>
         </div>
-
         <!-- قائمة السجلات -->
         <div class="card hidden" id="records-section">
-            <h2 lang="ar">قائمة الإصابات</h2>
-            <h2 lang="en" class="hidden">Records List</h2>
+            <h2>قائمة الإصابات</h2>
             <div class="search-container">
-                <input type="text" class="search-input" id="search-input" placeholder="ابحث في السجلات..." lang="ar">
-                <input type="text" class="search-input hidden" id="search-input-en" placeholder="Search records..." lang="en">
+                <input type="text" class="search-input" id="search-input" placeholder="ابحث في السجلات...">
                 <button class="search-btn" onclick="searchRecords()">
                     <i class="fas fa-search"></i>
-                    <span lang="ar">بحث</span>
-                    <span lang="en" class="hidden">Search</span>
+                    بحث
                 </button>
             </div>
             <table class="records-table">
                 <thead>
                     <tr>
-                        <th lang="ar">التاريخ</th>
-                        <th lang="en" class="hidden">Date</th>
-                        <th lang="ar">الإصابة</th>
-                        <th lang="en" class="hidden">Pest/Disease</th>
-                        <th lang="ar">المحصول</th>
-                        <th lang="en" class="hidden">Crop</th>
-                        <th lang="ar">الإجراءات</th>
-                        <th lang="en" class="hidden">Actions</th>
+                        <th>التاريخ</th>
+                        <th>الإصابة</th>
+                        <th>المحصول</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="records-table-body"></tbody>
             </table>
             <div class="no-records hidden" id="no-records">
-                <p lang="ar">لا توجد سجلات مسجلة</p>
-                <p lang="en" class="hidden">No records found</p>
+                <p>لا توجد سجلات مسجلة</p>
             </div>
             <div class="pagination" id="pagination"></div>
         </div>
-
         <!-- تفاصيل السجل -->
         <div class="card hidden" id="record-details-section">
             <button class="back-btn" onclick="showSection('records-section')">
                 <i class="fas fa-arrow-left"></i>
-                <span lang="ar">العودة للقائمة</span>
-                <span lang="en" class="hidden">Back to List</span>
+                العودة للقائمة
             </button>
-            <h2 lang="ar">تفاصيل السجل</h2>
-            <h2 lang="en" class="hidden">Record Details</h2>
+            <h2>تفاصيل السجل</h2>
             <div id="record-details"></div>
         </div>
     </div>
-
     <script>
         // المتغيرات
-        let currentLanguage = 'ar';
         let records = JSON.parse(localStorage.getItem('pestRecords')) || [];
         let currentPage = 1;
         const recordsPerPage = 5;
@@ -813,26 +682,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('discovery-date').value = today;
-
             initCamera();
             showSection('record-section');
             if (records.length > 0) renderRecordsTable();
             else document.getElementById('no-records').classList.remove('hidden');
-
-            // تهيئة jsPDF
             window.jsPDF = window.jspdf.jsPDF;
         });
-
-        // تبديل اللغة
-        function switchLanguage(lang) {
-            currentLanguage = lang;
-            document.querySelectorAll('[lang]').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll(`[lang="${lang}"]`).forEach(el => el.classList.remove('hidden'));
-            document.documentElement.lang = lang;
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            document.body.style.fontFamily = lang === 'ar' ? "'Cairo', sans-serif" : "Arial, sans-serif";
-            if (!document.getElementById('records-section').classList.contains('hidden')) renderRecordsTable();
-        }
 
         // عرض قسم معين
         function showSection(id) {
@@ -844,17 +699,13 @@
         // تهيئة الكاميرا الخلفية
         async function initCamera() {
             try {
-                // تحديد الكاميرا الخلفية
                 const constraints = {
-                    video: {
-                        facingMode: { exact: 'environment' } // الكاميرا الخلفية
-                    }
+                    video: { facingMode: { exact: 'environment' } }
                 };
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
                 document.getElementById('camera-preview').srcObject = stream;
             } catch (err) {
                 console.error("Camera error:", err);
-                // محاولة استخدام أي كاميرا متاحة
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({ video: true });
                     document.getElementById('camera-preview').srcObject = stream;
@@ -888,7 +739,6 @@
         function handleFileSelect(e) {
             const files = e.target.files;
             if (!files || files.length === 0) return;
-            
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(event) {
@@ -901,26 +751,16 @@
         // إضافة صورة
         function addImageToContainer(src) {
             if (!src) return;
-            
             const container = document.createElement('div');
             container.className = 'image-container';
-            
             const img = document.createElement('img');
             img.src = src;
-            img.onload = function() {
-                console.log('Image loaded:', src.substring(0, 50) + '...');
-            };
-            img.onerror = function() {
-                console.error('Failed to load image:', src.substring(0, 50) + '...');
-            };
-            
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-image';
             deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
             deleteBtn.onclick = function() {
                 container.remove();
             };
-            
             container.appendChild(img);
             container.appendChild(deleteBtn);
             document.getElementById('captured-images').appendChild(container);
@@ -930,11 +770,8 @@
         document.getElementById('pestForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const form = this;
-            
-            // جمع الصور
             const imageElements = document.querySelectorAll('#captured-images .image-container img');
             const images = Array.from(imageElements).map(img => img.src);
-            
             const formData = {
                 id: Date.now().toString(),
                 date: form['discovery-date'].value,
@@ -945,29 +782,21 @@
                 pesticide: form['pesticide'].value,
                 notes: form['notes'].value,
                 recordedBy: form['recorded-by'].value,
+                location: form['location'].value,
                 images: images,
                 createdAt: new Date().toISOString()
             };
-            
-            // إضافة السجل إلى القائمة
             records.unshift(formData);
-            
-            // حفظ في localStorage
             try {
                 localStorage.setItem('pestRecords', JSON.stringify(records));
                 alert('تم حفظ السجل بنجاح!');
             } catch (e) {
-                console.error('Error saving to localStorage:', e);
-                alert('حدث خطأ في حفظ البيانات. تأكد من أن المتصفح يدعم التخزين المحلي.');
+                alert('حدث خطأ في حفظ البيانات.');
                 return;
             }
-            
-            // إعادة تعيين النموذج
             form.reset();
             document.getElementById('discovery-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('captured-images').innerHTML = '';
-            
-            // التبديل إلى قائمة السجلات
             showSection('records-section');
         });
 
@@ -978,7 +807,6 @@
             const data = records.slice(start, start + recordsPerPage);
             const tbody = document.getElementById('records-table-body');
             tbody.innerHTML = '';
-
             if (data.length === 0) {
                 document.getElementById('no-records').classList.remove('hidden');
                 document.getElementById('pagination').innerHTML = '';
@@ -986,7 +814,6 @@
             } else {
                 document.getElementById('no-records').classList.add('hidden');
             }
-
             data.forEach(r => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -1023,15 +850,16 @@
             const r = records.find(r => r.id === id);
             if (!r) return;
             document.getElementById('record-details').innerHTML = `
-                <div class="detail-row"><div class="detail-label" lang="ar">التاريخ:</div><div class="detail-value">${r.date}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">اسم مدخل البيانات:</div><div class="detail-value">${r.recordedBy}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">الإصابة:</div><div class="detail-value">${r.pestName}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">الاسم العلمي:</div><div class="detail-value">${r.scientificName || '—'}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">المحصول:</div><div class="detail-value">${r.affectedCrop}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">الأعراض:</div><div class="detail-value">${r.symptoms}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">المبيد:</div><div class="detail-value">${r.pesticide || '—'}</div></div>
-                <div class="detail-row"><div class="detail-label" lang="ar">ملاحظات:</div><div class="detail-value">${r.notes || '—'}</div></div>
-                <h3 lang="ar">صور الإصابة:</h3>
+                <div class="detail-row"><div class="detail-label">التاريخ:</div><div class="detail-value">${r.date}</div></div>
+                <div class="detail-row"><div class="detail-label">اسم مدخل البيانات:</div><div class="detail-value">${r.recordedBy}</div></div>
+                <div class="detail-row"><div class="detail-label">الموقع:</div><div class="detail-value">${r.location}</div></div>
+                <div class="detail-row"><div class="detail-label">الإصابة:</div><div class="detail-value">${r.pestName}</div></div>
+                <div class="detail-row"><div class="detail-label">الاسم العلمي:</div><div class="detail-value">${r.scientificName || '—'}</div></div>
+                <div class="detail-row"><div class="detail-label">المحصول:</div><div class="detail-value">${r.affectedCrop}</div></div>
+                <div class="detail-row"><div class="detail-label">الأعراض:</div><div class="detail-value">${r.symptoms}</div></div>
+                <div class="detail-row"><div class="detail-label">المبيد:</div><div class="detail-value">${r.pesticide || '—'}</div></div>
+                <div class="detail-row"><div class="detail-label">ملاحظات:</div><div class="detail-value">${r.notes || '—'}</div></div>
+                <h3>صور الإصابة:</h3>
                 <div class="detail-images">${r.images && r.images.length > 0 ? r.images.map(s => `<img src="${s}" class="detail-image">`).join('') : 'لا توجد صور'}</div>
             `;
             showSection('record-details-section');
@@ -1040,8 +868,6 @@
         function generatePDF(id) {
             const r = records.find(r => r.id === id);
             if (!r) return;
-            
-            // إنشاء عنصر مؤقت لتصدير PDF
             const tempDiv = document.createElement('div');
             tempDiv.style.position = 'absolute';
             tempDiv.style.left = '-9999px';
@@ -1052,19 +878,17 @@
             tempDiv.style.backgroundColor = 'white';
             tempDiv.style.fontSize = '14px';
             tempDiv.style.lineHeight = '1.6';
-            
-            // بناء محتوى PDF
             tempDiv.innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;">
                     <h1 style="color: #2c3e50; font-size: 24px; margin-bottom: 5px; font-weight: 700;">تقرير الإصابة النباتية</h1>
                     <p style="font-size: 16px; color: #555;">تاريخ التقرير: ${new Date().toLocaleDateString()}</p>
                 </div>
-                
                 <div style="margin-bottom: 20px;">
                     <h3 style="color: #2c3e50; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">معلومات السجل</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
                         <div><strong style="color: #2c3e50;">تاريخ الاكتشاف:</strong> ${r.date}</div>
                         <div><strong style="color: #2c3e50;">اسم مدخل البيانات:</strong> ${r.recordedBy}</div>
+                        <div><strong style="color: #2c3e50;">الموقع:</strong> ${r.location}</div>
                         <div><strong style="color: #2c3e50;">اسم الإصابة:</strong> ${r.pestName}</div>
                         <div><strong style="color: #2c3e50;">الاسم العلمي:</strong> ${r.scientificName || '-'}</div>
                         <div><strong style="color: #2c3e50;">المحصول المصاب:</strong> ${r.affectedCrop}</div>
@@ -1073,7 +897,6 @@
                         <div><strong style="color: #2c3e50;">ملاحظات:</strong> ${r.notes || '-'}</div>
                     </div>
                 </div>
-                
                 ${r.images && r.images.length > 0 ? `
                 <div style="margin-bottom: 20px;">
                     <h3 style="color: #2c3e50; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">صور الإصابة</h3>
@@ -1086,46 +909,27 @@
                     </div>
                 </div>
                 ` : ''}
-                
                 <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 15px;">
                     تم إعداد هذا التقرير من قبل: <strong>${r.recordedBy}</strong>
                 </div>
             `;
-            
             document.body.appendChild(tempDiv);
-            
-            try {
-                // تحويل HTML إلى صورة باستخدام html2canvas
-                html2canvas(tempDiv, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    logging: false,
-                    backgroundColor: 'white'
-                }).then(canvas => {
-                    // إنشاء PDF من الصورة
-                    const pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4'
-                    });
-                    
-                    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                    
-                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-                    pdf.save(`${r.pestName}_${r.date}.pdf`);
-                }).catch(error => {
-                    console.error('Error generating PDF:', error);
-                    alert('حدث خطأ أثناء إنشاء الملف. يرجى المحاولة مرة أخرى.');
+            html2canvas(tempDiv, { scale: 2, useCORS: true, logging: false }).then(canvas => {
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
                 });
-            } catch (error) {
-                console.error('Error in generatePDF:', error);
-                alert('حدث خطأ أثناء إنشاء الملف. يرجى المحاولة مرة أخرى.');
-            } finally {
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`${r.pestName}_${r.date}.pdf`);
+            }).catch(error => {
+                alert('حدث خطأ أثناء إنشاء الملف.');
+            }).finally(() => {
                 document.body.removeChild(tempDiv);
-            }
+            });
         }
 
         function editRecord(id) {
@@ -1139,11 +943,10 @@
             document.getElementById('pesticide').value = r.pesticide || '';
             document.getElementById('notes').value = r.notes || '';
             document.getElementById('recorded-by').value = r.recordedBy;
-
+            document.getElementById('location').value = r.location;
             const container = document.getElementById('captured-images');
             container.innerHTML = '';
             (r.images || []).forEach(src => addImageToContainer(src));
-
             records = records.filter(r => r.id !== id);
             try {
                 localStorage.setItem('pestRecords', JSON.stringify(records));
@@ -1167,7 +970,7 @@
         }
 
         function searchRecords() {
-            const term = (currentLanguage === 'ar' ? document.getElementById('search-input') : document.getElementById('search-input-en')).value.toLowerCase().trim();
+            const term = document.getElementById('search-input').value.toLowerCase().trim();
             if (!term) return renderRecordsTable();
             const results = records.filter(r =>
                 r.pestName.toLowerCase().includes(term) ||
@@ -1176,7 +979,8 @@
                 r.symptoms.toLowerCase().includes(term) ||
                 (r.pesticide && r.pesticide.toLowerCase().includes(term)) ||
                 (r.notes && r.notes.toLowerCase().includes(term)) ||
-                r.recordedBy.toLowerCase().includes(term)
+                r.recordedBy.toLowerCase().includes(term) ||
+                r.location.toLowerCase().includes(term)
             );
             renderSearchResults(results);
         }
